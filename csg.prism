@@ -1,0 +1,120 @@
+// concurrent stochastic game
+csg
+
+// attacker and defender actors
+player p1 
+	attacker 
+endplayer
+player p2 
+	defender 
+endplayer
+
+// global attributes accessible from both players
+global AccesstoReverseShell : bool;
+global Reconnaissance : bool;
+global ExecuteArbitraryCode : bool;
+global AccesstoSensitiveFiles : bool;
+global AccesstoMySQL : bool;
+// initial attributes
+global CGIscriptsenabled : bool init true;
+global SOCKS5ProxyActive : bool init true;
+global MisconfiguredApache : bool init true;
+global MySQLServerVersion : bool init true;
+global ApacheHTTPServerVersion : bool init true;
+
+// goal
+global DataExfiltration : bool;
+
+module attacker
+	// actions
+	//[noOp1] !DataExfiltration -> true;
+
+	[exfiltrateData] (ExecuteArbitraryCode | AccesstoMySQL) & !DataExfiltration -> (DataExfiltration'=true);
+
+	[bufferOverflow] (AccesstoReverseShell & SOCKS5ProxyActive & MySQLServerVersion) & !ExecuteArbitraryCode & !DataExfiltration -> (ExecuteArbitraryCode'=true);
+
+	[getLoginData] (AccesstoSensitiveFiles) & !AccesstoMySQL & !DataExfiltration -> (AccesstoMySQL'=true);
+	[bribe] !AccesstoMySQL & !DataExfiltration  -> (AccesstoMySQL'=true);
+	[searchOffice] !AccesstoMySQL & !DataExfiltration -> (AccesstoMySQL'=true);
+
+	[pathTraversal] (Reconnaissance) & !AccesstoReverseShell & !DataExfiltration -> (AccesstoReverseShell'=true);
+
+	[getFiles] (AccesstoReverseShell) & !AccesstoSensitiveFiles & !DataExfiltration  -> (AccesstoSensitiveFiles'=true);
+	[webRecon] !Reconnaissance & !DataExfiltration  -> (Reconnaissance'=true);
+
+	//[end1] DataExfiltration -> true;
+endmodule
+
+label "terminate" =  DataExfiltration=true;
+
+// reward structure based on the cost of the action
+rewards "p1"
+	//[noOp1] true : -1;
+
+        [exfiltrateData] true : 500; // goal
+	[bufferOverflow] true : -15;
+	[getLoginData] true : -10;
+	[bribe] true : -500;
+	[searchOffice] true : -500;
+	[pathTraversal] true : -20;
+	[getFiles] true : -30;
+	[webRecon] true : -5;
+endrewards
+
+module defender
+	// local attributes
+	NewMySQLVersion : bool;
+	UpdateApache : bool;
+	InstalledNewMySQL : bool;
+	BackupMySQL : bool;
+	UpdateMySQL : bool;
+	BackupApache : bool;
+	InstalledNewApache : bool;
+	NewApacheVersion : bool;
+
+	// actions
+	//[noOp2] !DataExfiltration -> true;
+
+	[changeCredentials] (AccesstoMySQL) & !DataExfiltration -> (AccesstoMySQL'=false);
+	[deactivateDOCKS5Proxy] (SOCKS5ProxyActive) & !DataExfiltration -> (SOCKS5ProxyActive'=false);
+	[protectFiles] (AccesstoSensitiveFiles) & !DataExfiltration -> (AccesstoSensitiveFiles'=false);
+	[disableCGIscripts] (CGIscriptsenabled) & !DataExfiltration -> (CGIscriptsenabled'=false);
+	[reconfigureApache] (MisconfiguredApache) & !DataExfiltration -> (MisconfiguredApache'=false);
+
+	[checkMySQLUpdates] (!NewMySQLVersion) & !DataExfiltration-> (NewMySQLVersion'=true);
+	[backupMySQL] (!BackupMySQL) & !DataExfiltration -> (BackupMySQL'=true);
+	[installMySQL] (NewMySQLVersion) & !InstalledNewMySQL & !DataExfiltration ->  (InstalledNewMySQL'=true);
+	[rebootMySQL] (InstalledNewMySQL & BackupMySQL) & !UpdateMySQL & !DataExfiltration  -> (UpdateMySQL'=true);
+	[updateMySQL] (UpdateMySQL) & MySQLServerVersion & !DataExfiltration -> (MySQLServerVersion'=false);
+
+	[checkApacheUpdates] (!NewApacheVersion) & !DataExfiltration -> (NewApacheVersion'=true); 
+	[backupApache] (!BackupApache) & !DataExfiltration -> (BackupApache'=true);
+	[installApache] (NewApacheVersion) & !InstalledNewApache & !DataExfiltration -> (InstalledNewApache'=true);
+	[rebootApache] (InstalledNewApache & BackupApache) & !UpdateApache & !DataExfiltration -> (UpdateApache'=true);
+	[updateApache] (UpdateApache) & ApacheHTTPServerVersion & !DataExfiltration -> (ApacheHTTPServerVersion'=false);
+
+	//[end2] DataExfiltration -> true;
+endmodule
+
+// reward structure based on the cost of the action
+rewards "p2"
+	//[noOp2] true : -1;
+
+	[changeCredentials] true : -70;
+	[deactivateDOCKS5Proxy] true : -50;
+	[protectFiles] true : -25;
+	[disableCGIscripts] true : -50;
+	[reconfigureApache] true : -30;
+
+	[checkMySQLUpdates] true : -5;
+	[backupMySQL] true : -50;
+	[installMySQL] true : -20;
+	[rebootMySQL] true : -30;
+	[updateMySQL] true : -10;
+
+	[checkApacheUpdates] true : -5;
+	[backupApache] true : -50;
+	[installApache] true : -20;
+	[rebootApache] true : -30;
+	[updateApache] true : -10;
+endrewards
