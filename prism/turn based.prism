@@ -20,6 +20,7 @@ global Reconnaissance : bool;
 global ExecuteArbitraryCode : bool;
 global AccesstoSensitiveFiles : bool;
 global AccesstoMySQL : bool;
+
 // initial attributes
 global CGIscriptsenabled : bool init true;
 global SOCKS5ProxyActive : bool init true;
@@ -44,15 +45,11 @@ module attacker
 	//[noOp1] !DataExfiltration -> true;
 
 	[exfiltrateData] sched=1 & (ExecuteArbitraryCode | AccesstoMySQL) & !DataExfiltration -> (DataExfiltration'=true) & (sched'=2);
-
 	[bufferOverflow] sched=1 & AccesstoReverseShell & SOCKS5ProxyActive & MySQLServerVersion  & !ExecuteArbitraryCode & !DataExfiltration & !bufferOverflow -> (ExecuteArbitraryCode'=true) & (bufferOverflow'=true) & (sched'=2);
-
 	[getLoginData] sched=1 & AccesstoSensitiveFiles & !AccesstoMySQL & !DataExfiltration & !getLoginData -> (AccesstoMySQL'=true) & (getLoginData'=true) & (sched'=2);
 	[bribe] sched=1 & !AccesstoMySQL & !DataExfiltration & !bribe -> (AccesstoMySQL'=true) & (bribe'=true) & (sched'=2);
 	[searchOffice] sched=1 & !AccesstoMySQL & !DataExfiltration & !searchOffice -> (AccesstoMySQL'=true) & (searchOffice'=true) & (sched'=2);
-
 	[pathTraversal] sched=1 & Reconnaissance & CGIscriptsenabled & ApacheHTTPServerVersion & !AccesstoReverseShell & !DataExfiltration & !pathTraversal -> (AccesstoReverseShell'=true) & (pathTraversal'=true) & (sched'=2);
-
 	[getFiles] sched=1 & AccesstoReverseShell & !AccesstoSensitiveFiles & !DataExfiltration & !getFiles  -> (AccesstoSensitiveFiles'=true) & (getFiles'=true) & (sched'=2);
 	[webRecon] sched=1 & !Reconnaissance & !DataExfiltration & !webRecon -> (Reconnaissance'=true) & (webRecon'=true) & (sched'=2);
 	

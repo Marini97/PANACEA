@@ -1,0 +1,55 @@
+// Turn-based stochastic multi-player games
+smg
+
+// Players
+player attacker
+	attacker,
+	[exfiltrateData], [exfiltrateData], [bufferOverflow], [getLoginData], [bribe], [searchOffice], [pathTraversal], [getFiles], [webRecon], [pathTraversal], [webRecon]
+endplayer
+player defender
+	defender,
+	[changeCredentials], [updateMySQL], [deactivateDOCKS5Proxy], [protectFiles], [rebootMySQL], [], [updateApache], [disableCGIscripts], [reconfigureApache], [installMySQL], [backupMySQL], [rebootApache], [], [updateApache], [disableCGIscripts], [checkMySQLUpdates], [installApache], [backupApache], [rebootApache], [], [checkApacheUpdates], [installApache], [backupApache], [checkApacheUpdates]
+endplayer
+
+global sched : [1..2];
+
+// attacker goal
+global DataExfiltration : bool;
+label "terminate" = DataExfiltration=true;
+
+// global variables
+global ExecuteArbitraryCode : bool;
+global AccesstoMySQL : bool;
+global AccesstoReverseShell : bool;
+global AccesstoSensitiveFiles : bool;
+global Reconnaissance : bool;
+
+// initial state
+global MySQLServerVersion : bool init true;
+global ApacheHTTPServerVersion : bool init true;
+global MisconfiguredApache : bool init true;
+global SOCKS5ProxyActive : bool init true;
+global CGIscriptsenabled : bool init true;
+
+module attacker
+
+	bribe : bool;
+	exfiltrateData : bool;
+	webRecon : bool;
+	getFiles : bool;
+	searchOffice : bool;
+	getLoginData : bool;
+	bufferOverflow : bool;
+	pathTraversal : bool;
+
+	[exfiltrateData] sched=1 & (ExecuteArbitraryCode | AccesstoMySQL) & !DataExfiltration -> (DataExfiltration'=true) & (sched'=2);
+	[bufferOverflow] sched=1 & (AccesstoReverseShell) & !DataExfiltration -> (ExecuteArbitraryCode'=true) & (sched'=2);
+	[getLoginData] sched=1 & (AccesstoSensitiveFiles) & !DataExfiltration -> (AccesstoMySQL'=true) & (sched'=2);
+	[bribe] sched=1 & (Bribe) & !DataExfiltration -> (AccesstoMySQL'=true) & (sched'=2);
+	[searchOffice] sched=1 & (SearchOffice) & !DataExfiltration -> (AccesstoMySQL'=true) & (sched'=2);
+	[pathTraversal] sched=1 & (Reconnaissance & Reconnaissance) & !DataExfiltration -> (AccesstoReverseShell'=true) & (sched'=2);
+	[getFiles] sched=1 & (AccesstoReverseShell) & !DataExfiltration -> (ExecuteArbitraryCode'=true) & (sched'=2);
+	[webRecon] sched=1 & (WebRecon & WebRecon) & !DataExfiltration -> (Reconnaissance'=true) & (sched'=2);
+
+endmodule
+

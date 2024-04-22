@@ -2,7 +2,7 @@
 <adtree>
 	<node refinement="disjunctive">
 		<label>Data Exfiltration</label>
-		<comment>Type: Attribute
+		<comment>Type: Goal
 Role: Attacker</comment>
 		<node refinement="disjunctive">
 			<label>Access to MySQL</label>
@@ -33,7 +33,6 @@ Role: Attacker</comment>
 				<node refinement="conjunctive">
 					<label>Misconfigured Apache</label>
 					<comment>Type: Attribute
-Probability: p
 Role: Attacker</comment>
 					<node refinement="conjunctive" switchRole="yes">
 						<label>Reconfigure Apache</label>
@@ -66,7 +65,6 @@ Role: Attacker</comment>
 					<node refinement="conjunctive">
 						<label>CGI scripts enabled</label>
 						<comment>Type: Attribute
-Probability: p
 Role: Attacker</comment>
 						<node refinement="conjunctive" switchRole="yes">
 							<label>Disable CGI scripts</label>
@@ -77,9 +75,8 @@ Role: Defender</comment>
 						</node>
 					</node>
 					<node refinement="conjunctive">
-						<label>Apache HTTP Server: 2.4.49 - 2.4.50</label>
+						<label>Apache HTTP Server Version</label>
 						<comment>Type: Attribute
-Probability: p
 Role: Attacker</comment>
 						<node refinement="conjunctive" switchRole="yes">
 							<label>Update Apache</label>
@@ -168,7 +165,6 @@ Role: Attacker</comment>
 				<node refinement="conjunctive">
 					<label>CGI scripts enabled</label>
 					<comment>Type: Attribute
-Probability: p
 Role: Attacker</comment>
 					<node refinement="conjunctive" switchRole="yes">
 						<label>Disable CGI scripts</label>
@@ -179,9 +175,8 @@ Role: Defender</comment>
 					</node>
 				</node>
 				<node refinement="conjunctive">
-					<label>Apache HTTP Server: 2.4.49 - 2.4.50</label>
+					<label>Apache HTTP Server Version</label>
 					<comment>Type: Attribute
-Probability: p
 Role: Attacker</comment>
 					<node refinement="conjunctive" switchRole="yes">
 						<label>Update Apache</label>
@@ -228,7 +223,6 @@ Role: Defender</comment>
 			<node refinement="conjunctive">
 				<label>SOCKS5 Proxy Active</label>
 				<comment>Type: Attribute
-Probability: p
 Role: Attacker</comment>
 				<node refinement="conjunctive" switchRole="yes">
 					<label>Deactivate DOCKS5 proxy</label>
@@ -239,9 +233,8 @@ Role: Defender</comment>
 				</node>
 			</node>
 			<node refinement="conjunctive">
-				<label>MySQL Server: 5.7.0 - 8.0.34</label>
+				<label>MySQL Server Version</label>
 				<comment>Type: Attribute
-Probability: p
 Role: Attacker</comment>
 				<node refinement="conjunctive" switchRole="yes">
 					<label>Update MySQL</label>
