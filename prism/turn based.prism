@@ -61,7 +61,7 @@ label "terminate" =  DataExfiltration=true;
 rewards "attacker"
 	//[noOp1] true : 1;
 
-        [exfiltrateData] true : 0; // goal
+    [exfiltrateData] true : 0; // goal
 	[bufferOverflow] true : 15;
 	[getLoginData] true : 10;
 	[bribe] true : 500;

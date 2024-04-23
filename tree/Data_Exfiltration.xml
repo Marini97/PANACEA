@@ -8,27 +8,27 @@ Role: Attacker</comment>
 			<label>Access to MySQL</label>
 			<comment>Type: Attribute
 Action: exfiltrateData
-Cost: c
+Cost: 50
 Role: Attacker</comment>
 			<node refinement="conjunctive">
 				<label>Search Office</label>
 				<comment>Type: Action
 Action: searchOffice
-Cost: c
+Cost: 500
 Role: Attacker</comment>
 			</node>
 			<node refinement="conjunctive">
 				<label>Bribe</label>
 				<comment>Type: Action
 Action: bribe
-Cost: c
+Cost: 500
 Role: Attacker</comment>
 			</node>
 			<node refinement="conjunctive">
 				<label>Access to Sensitive Files</label>
 				<comment>Type: Attribute
 Action: getLoginData
-Cost: c
+Cost: 10
 Role: Attacker</comment>
 				<node refinement="conjunctive">
 					<label>Misconfigured Apache</label>
@@ -38,7 +38,7 @@ Role: Attacker</comment>
 						<label>Reconfigure Apache</label>
 						<comment>Type: Action
 Action: reconfigureApache
-Cost: c
+Cost: 30
 Role: Defender</comment>
 					</node>
 				</node>
@@ -46,19 +46,19 @@ Role: Defender</comment>
 					<label>Access to Reverse Shell</label>
 					<comment>Type: Attribute
 Action: getFiles
-Cost: c
+Cost: 30
 Role: Attacker</comment>
 					<node refinement="conjunctive">
 						<label>Reconnaissance</label>
 						<comment>Type: Attribute
 Action: pathTraversal
-Cost: c
+Cost: 20
 Role: Attacker</comment>
 						<node refinement="conjunctive">
 							<label>Web Recon</label>
 							<comment>Type: Action
 Action: webRecon
-Cost: c
+Cost: 5
 Role: Attacker</comment>
 						</node>
 					</node>
@@ -70,7 +70,7 @@ Role: Attacker</comment>
 							<label>Disable CGI scripts</label>
 							<comment>Type: Action
 Action: disableCGIscripts
-Cost: c
+Cost: 50
 Role: Defender</comment>
 						</node>
 					</node>
@@ -82,7 +82,7 @@ Role: Attacker</comment>
 							<label>Update Apache</label>
 							<comment>Type: Attribute
 Action: updateApache
-Cost: c
+Cost: 10
 Role: Defender</comment>
 							<node refinement="conjunctive">
 								<label>Backup Apache</label>
@@ -92,7 +92,7 @@ Role: Defender</comment>
 									<label>Create Backup Apache</label>
 									<comment>Type: Action
 Action: backupApache
-Cost: c
+Cost: 50
 Role: Defender</comment>
 								</node>
 							</node>
@@ -100,19 +100,19 @@ Role: Defender</comment>
 								<label>Installed New Apache</label>
 								<comment>Type: Attribute
 Action: rebootApache
-Cost: c
+Cost: 30
 Role: Defender</comment>
 								<node refinement="conjunctive">
 									<label>New Apache Version</label>
 									<comment>Type: Attribute
 Action: installApache
-Cost: c
+Cost: 20
 Role: Defender</comment>
 									<node refinement="conjunctive">
 										<label>Check for Apache Updates</label>
 										<comment>Type: Action
 Action: checkApacheUpdates
-Cost: c
+Cost: 5
 Role: Defender</comment>
 									</node>
 								</node>
@@ -124,7 +124,7 @@ Role: Defender</comment>
 					<label>Protect Files</label>
 					<comment>Type: Action
 Action: protectFiles
-Cost: c
+Cost: 25
 Role: Defender</comment>
 				</node>
 			</node>
@@ -132,7 +132,7 @@ Role: Defender</comment>
 				<label>Change Credentials</label>
 				<comment>Type: Action
 Action: changeCredentials
-Cost: c
+Cost: 70
 Role: Defender</comment>
 			</node>
 		</node>
@@ -140,25 +140,25 @@ Role: Defender</comment>
 			<label>Execute Arbitrary Code</label>
 			<comment>Type: Attribute
 Action: exfiltrateData
-Cost: c
+Cost: 50
 Role: Attacker</comment>
 			<node refinement="conjunctive">
 				<label>Access to Reverse Shell</label>
 				<comment>Type: Attribute
 Action: bufferOverflow
-Cost: c
+Cost: 30
 Role: Attacker</comment>
 				<node refinement="conjunctive">
 					<label>Reconnaissance</label>
 					<comment>Type: Attribute
 Action: pathTraversal
-Cost: c
+Cost: 20
 Role: Attacker</comment>
 					<node refinement="conjunctive">
 						<label>Web Recon</label>
 						<comment>Type: Action
 Action: webRecon
-Cost: c
+Cost: 5
 Role: Attacker</comment>
 					</node>
 				</node>
@@ -170,7 +170,7 @@ Role: Attacker</comment>
 						<label>Disable CGI scripts</label>
 						<comment>Type: Action
 Action: disableCGIscripts
-Cost: c
+Cost: 50
 Role: Defender</comment>
 					</node>
 				</node>
@@ -182,7 +182,7 @@ Role: Attacker</comment>
 						<label>Update Apache</label>
 						<comment>Type: Attribute
 Action: updateApache
-Cost: c
+Cost: 10
 Role: Defender</comment>
 						<node refinement="conjunctive">
 							<label>Backup Apache</label>
@@ -192,7 +192,7 @@ Role: Defender</comment>
 								<label>Create Backup Apache</label>
 								<comment>Type: Action
 Action: backupApache
-Cost: c
+Cost: 50
 Role: Defender</comment>
 							</node>
 						</node>
@@ -200,19 +200,19 @@ Role: Defender</comment>
 							<label>Installed New Apache</label>
 							<comment>Type: Attribute
 Action: rebootApache
-Cost: c
+Cost: 30
 Role: Defender</comment>
 							<node refinement="conjunctive">
 								<label>New Apache Version</label>
 								<comment>Type: Attribute
 Action: installApache
-Cost: c
+Cost: 20
 Role: Defender</comment>
 								<node refinement="conjunctive">
 									<label>Check for Apache Updates</label>
 									<comment>Type: Action
 Action: checkApacheUpdates
-Cost: c
+Cost: 5
 Role: Defender</comment>
 								</node>
 							</node>
@@ -228,7 +228,7 @@ Role: Attacker</comment>
 					<label>Deactivate DOCKS5 proxy</label>
 					<comment>Type: Action
 Action: deactivateDOCKS5Proxy
-Cost: c
+Cost: 50
 Role: Defender</comment>
 				</node>
 			</node>
@@ -240,7 +240,7 @@ Role: Attacker</comment>
 					<label>Update MySQL</label>
 					<comment>Type: Attribute
 Action: updateMySQL
-Cost: c
+Cost: 10
 Role: Defender</comment>
 					<node refinement="conjunctive">
 						<label>Backup MySQL</label>
@@ -250,7 +250,7 @@ Role: Defender</comment>
 							<label>Create Backup MySQL</label>
 							<comment>Type: Action
 Action: backupMySQL
-Cost: c
+Cost: 50
 Role: Defender</comment>
 						</node>
 					</node>
@@ -258,19 +258,19 @@ Role: Defender</comment>
 						<label>Installed New MySQL</label>
 						<comment>Type: Attribute
 Action: rebootMySQL
-Cost: c
+Cost: 30
 Role: Defender</comment>
 						<node refinement="conjunctive">
 							<label>New MySQL Version</label>
 							<comment>Type: Attribute
 Action: installMySQL
-Cost: c
+Cost: 20
 Role: Defender</comment>
 							<node refinement="conjunctive">
 								<label>Check for MySQL Updates</label>
 								<comment>Type: Action
 Action: checkMySQLUpdates
-Cost: c
+Cost: 5
 Role: Defender</comment>
 							</node>
 						</node>
