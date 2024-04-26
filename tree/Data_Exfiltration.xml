@@ -48,13 +48,13 @@ Role: Defender</comment>
 Action: getFiles
 Cost: 30
 Role: Attacker</comment>
-					<node refinement="conjunctive">
+					<node refinement="disjunctive">
 						<label>Reconnaissance</label>
 						<comment>Type: Attribute
 Action: pathTraversal
 Cost: 20
 Role: Attacker</comment>
-						<node refinement="conjunctive">
+						<node refinement="disjunctive">
 							<label>Web Recon</label>
 							<comment>Type: Action
 Action: webRecon
@@ -148,13 +148,13 @@ Role: Attacker</comment>
 Action: bufferOverflow
 Cost: 30
 Role: Attacker</comment>
-				<node refinement="conjunctive">
+				<node refinement="disjunctive">
 					<label>Reconnaissance</label>
 					<comment>Type: Attribute
 Action: pathTraversal
 Cost: 20
 Role: Attacker</comment>
-					<node refinement="conjunctive">
+					<node refinement="disjunctive">
 						<label>Web Recon</label>
 						<comment>Type: Action
 Action: webRecon

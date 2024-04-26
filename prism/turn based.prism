@@ -33,25 +33,26 @@ global DataExfiltration : bool;
 
 module attacker
 
-	bribe : bool;
-	bufferOverflow : bool;
 	getLoginData : bool;
-	searchOffice : bool;
-	pathTraversal : bool;
+	bribe : bool;
 	getFiles : bool;
+	bufferOverflow : bool;
+	pathTraversal : bool;
 	webRecon : bool;
+	exfiltrateData : bool;
+	searchOffice : bool;
 
 	// actions
 	//[noOp1] !DataExfiltration -> true;
 
-	[exfiltrateData] sched=1 & (ExecuteArbitraryCode | AccesstoMySQL) & !DataExfiltration -> (DataExfiltration'=true) & (sched'=2);
-	[bufferOverflow] sched=1 & AccesstoReverseShell & SOCKS5ProxyActive & MySQLServerVersion  & !ExecuteArbitraryCode & !DataExfiltration & !bufferOverflow -> (ExecuteArbitraryCode'=true) & (bufferOverflow'=true) & (sched'=2);
-	[getLoginData] sched=1 & AccesstoSensitiveFiles & !AccesstoMySQL & !DataExfiltration & !getLoginData -> (AccesstoMySQL'=true) & (getLoginData'=true) & (sched'=2);
-	[bribe] sched=1 & !AccesstoMySQL & !DataExfiltration & !bribe -> (AccesstoMySQL'=true) & (bribe'=true) & (sched'=2);
-	[searchOffice] sched=1 & !AccesstoMySQL & !DataExfiltration & !searchOffice -> (AccesstoMySQL'=true) & (searchOffice'=true) & (sched'=2);
-	[pathTraversal] sched=1 & Reconnaissance & CGIscriptsenabled & ApacheHTTPServerVersion & !AccesstoReverseShell & !DataExfiltration & !pathTraversal -> (AccesstoReverseShell'=true) & (pathTraversal'=true) & (sched'=2);
-	[getFiles] sched=1 & AccesstoReverseShell & !AccesstoSensitiveFiles & !DataExfiltration & !getFiles  -> (AccesstoSensitiveFiles'=true) & (getFiles'=true) & (sched'=2);
-	[webRecon] sched=1 & !Reconnaissance & !DataExfiltration & !webRecon -> (Reconnaissance'=true) & (webRecon'=true) & (sched'=2);
+	[exfiltrateData] sched=1 & !DataExfiltration & !DataExfiltration & !exfiltrateData & (AccesstoMySQL | ExecuteArbitraryCode) -> (DataExfiltration'=true) & (exfiltrateData'=true) & (sched'=2);
+	[searchOffice] sched=1 & !DataExfiltration & !AccesstoMySQL & !searchOffice -> (AccesstoMySQL'=true) & (searchOffice'=true) & (sched'=2);
+	[bribe] sched=1 & !DataExfiltration & !AccesstoMySQL & !bribe -> (AccesstoMySQL'=true) & (bribe'=true) & (sched'=2);
+	[getLoginData] sched=1 & !DataExfiltration & !AccesstoMySQL & !getLoginData & (AccesstoSensitiveFiles) -> (AccesstoMySQL'=true) & (getLoginData'=true) & (sched'=2);
+	[bufferOverflow] sched=1  & !DataExfiltration  & !ExecuteArbitraryCode & !bufferOverflow & (SOCKS5ProxyActive & AccesstoReverseShell & MySQLServerVersion) -> (ExecuteArbitraryCode'=true) & (bufferOverflow'=true) & (sched'=2);
+	[getFiles] sched=1 & !DataExfiltration & !AccesstoSensitiveFiles & !getFiles & (MisconfiguredApache & AccesstoReverseShell) -> (AccesstoSensitiveFiles'=true) & (getFiles'=true) & (sched'=2);
+	[pathTraversal] sched=1 & !DataExfiltration & !AccesstoReverseShell & !pathTraversal & (CGIscriptsenabled & ApacheHTTPServerVersion & Reconnaissance) -> (AccesstoReverseShell'=true) & (pathTraversal'=true) & (sched'=2);
+	[webRecon] sched=1 & !DataExfiltration & !Reconnaissance & !webRecon -> (Reconnaissance'=true) & (webRecon'=true) & (sched'=2);
 	
 endmodule
 
@@ -61,18 +62,19 @@ label "terminate" =  DataExfiltration=true;
 rewards "attacker"
 	//[noOp1] true : 1;
 
-    [exfiltrateData] true : 0; // goal
-	[bufferOverflow] true : 15;
+    [exfiltrateData] true : 50; // goal
+	[bufferOverflow] true : 30;
 	[getLoginData] true : 10;
 	[bribe] true : 500;
 	[searchOffice] true : 500;
 	[pathTraversal] true : 20;
 	[getFiles] true : 30;
 	[webRecon] true : 5;
+
 endrewards
 
 module defender
-	// local attributes
+
 	NewMySQLVersion : bool;
 	UpdateApache : bool;
 	InstalledNewMySQL : bool;
@@ -82,27 +84,22 @@ module defender
 	InstalledNewApache : bool;
 	NewApacheVersion : bool;
 
-	// actions
-	//[noOp2] !DataExfiltration -> true;
+	[changeCredentials] sched=2 & !DataExfiltration & AccesstoMySQL -> (AccesstoMySQL'=false) & (sched'=1);
+	[protectFiles] sched=2 & !DataExfiltration & AccesstoSensitiveFiles -> (AccesstoSensitiveFiles'=false) & (sched'=1);
+	[deactivateDOCKS5Proxy] sched=2 & !DataExfiltration & SOCKS5ProxyActive -> (SOCKS5ProxyActive'=false) & (sched'=1);
+	[updateMySQL] sched=2 & !DataExfiltration & MySQLServerVersion & (UpdateMySQL) -> (MySQLServerVersion'=false) & (sched'=1);
+	[reconfigureApache] sched=2 & !DataExfiltration & MisconfiguredApache -> (MisconfiguredApache'=false) & (sched'=1);
+	[disableCGIscripts] sched=2 & !DataExfiltration & CGIscriptsenabled -> (CGIscriptsenabled'=false) & (sched'=1);
+	[updateApache] sched=2 & !DataExfiltration & ApacheHTTPServerVersion & (UpdateApache) -> (ApacheHTTPServerVersion'=false) & (sched'=1);
 
-	[changeCredentials] sched=2 & AccesstoMySQL & !DataExfiltration -> (AccesstoMySQL'=false) & (sched'=1);
-	[deactivateDOCKS5Proxy] sched=2 & SOCKS5ProxyActive & !DataExfiltration -> (SOCKS5ProxyActive'=false) & (sched'=1);
-	[protectFiles] sched=2 & AccesstoSensitiveFiles & !DataExfiltration -> (AccesstoSensitiveFiles'=false) & (sched'=1);
-	[disableCGIscripts] sched=2 & CGIscriptsenabled & !DataExfiltration -> (CGIscriptsenabled'=false) & (sched'=1);
-	[reconfigureApache] sched=2 & MisconfiguredApache & !DataExfiltration -> (MisconfiguredApache'=false) & (sched'=1);
-
-	[checkMySQLUpdates] sched=2 & !NewMySQLVersion & !DataExfiltration-> (NewMySQLVersion'=true) & (sched'=1);
-	[backupMySQL] sched=2 & !BackupMySQL & !DataExfiltration -> (BackupMySQL'=true) & (sched'=1);
-	[installMySQL] sched=2 & NewMySQLVersion & !InstalledNewMySQL & !DataExfiltration ->  (InstalledNewMySQL'=true) & (sched'=1);
-	[rebootMySQL] sched=2 & InstalledNewMySQL & BackupMySQL & !UpdateMySQL & !DataExfiltration  -> (UpdateMySQL'=true) & (sched'=1);
-	[updateMySQL] sched=2 & UpdateMySQL & MySQLServerVersion & !DataExfiltration -> (MySQLServerVersion'=false) & (sched'=1);
-
-	[checkApacheUpdates] sched=2 & !NewApacheVersion & !DataExfiltration -> (NewApacheVersion'=true) & (sched'=1); 
-	[backupApache] sched=2 & !BackupApache & !DataExfiltration -> (BackupApache'=true) & (sched'=1);
-	[installApache] sched=2 & NewApacheVersion & !InstalledNewApache & !DataExfiltration -> (InstalledNewApache'=true) & (sched'=1);
-	[rebootApache] sched=2 & InstalledNewApache & BackupApache & !UpdateApache & !DataExfiltration -> (UpdateApache'=true) & (sched'=1);
-	[updateApache] sched=2 & UpdateApache & ApacheHTTPServerVersion & !DataExfiltration -> (ApacheHTTPServerVersion'=false) & (sched'=1);
-
+	[rebootMySQL] sched=2 & !DataExfiltration & !UpdateMySQL & (BackupMySQL & InstalledNewMySQL) -> (UpdateMySQL'=true) & (sched'=1);
+	[rebootApache] sched=2 & !DataExfiltration & !UpdateApache & (BackupApache & InstalledNewApache) -> (UpdateApache'=true) & (sched'=1);
+	[backupMySQL] sched=2 & !DataExfiltration & !BackupMySQL -> (BackupMySQL'=true) & (sched'=1);
+	[installMySQL] sched=2 & !DataExfiltration & !InstalledNewMySQL & (NewMySQLVersion) -> (InstalledNewMySQL'=true) & (sched'=1);
+	[backupApache] sched=2 & !DataExfiltration & !BackupApache -> (BackupApache'=true) & (sched'=1);
+	[installApache] sched=2 & !DataExfiltration & !InstalledNewApache & (NewApacheVersion) -> (InstalledNewApache'=true) & (sched'=1);
+	[checkMySQLUpdates] sched=2 & !DataExfiltration & !NewMySQLVersion -> (NewMySQLVersion'=true) & (sched'=1);
+	[checkApacheUpdates] sched=2 & !DataExfiltration & !NewApacheVersion -> (NewApacheVersion'=true) & (sched'=1); 
 
 endmodule
 

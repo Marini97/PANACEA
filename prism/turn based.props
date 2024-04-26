@@ -1,4 +1,4 @@
-Pmin=? [F "terminate"]
+Pmin=? [ F "terminate" ]
 
 <<attacker,defender>>R{"attacker"}min=? [ F "terminate" ]
 
@@ -6,7 +6,7 @@ Pmin=? [F "terminate"]
 
 <<attacker,defender>>R{"attacker"}min=? [ F "terminate" ]+R{"defender"}min=? [ F "deadlock" ]
 
-<<attacker,defender>>min=?(R{"attacker"}[ F "terminate" ]+R{"defender"}[ F "deadlock" ])
+<<attacker,defender>>min=? (R{"attacker"}[F "terminate"] + R{"defender"}[F "deadlock"])
 
-<<attacker:defender>>min=?(R{"attacker"}[ F "terminate" ]+R{"defender"}[ F "deadlock" ])
+<<attacker:defender>>min=? (R{"attacker"}[F "terminate"] + R{"defender"}[F "deadlock"])
 
