@@ -76,3 +76,21 @@ class Tree:
             data.append([node.label, node.refinement, node.type, node.action, node.cost, node.role, parent, children])
         return pd.DataFrame(data, columns=["Label", "Refinement", "Type", "Action", "Cost", "Role", "Parent", "Children"])
     
+    def hierarchy_pos(self, G, root, width=1., vert_gap = 0.2, vert_loc = 0, xcenter = 0.5, pos = None, parent = None):    
+        if pos is None:
+            pos = {root:(xcenter,vert_loc)}
+        else:
+            pos[root] = (xcenter, vert_loc)
+        children = list(G.neighbors(root))
+        if not isinstance(G, nx.DiGraph) and parent is not None:
+            children.remove(parent)  
+        if len(children)!=0:
+            dx = width/len(children) 
+            nextx = xcenter - width/2 - dx/2
+            for child in children:
+                nextx += dx
+                pos = self.hierarchy_pos(G, child, width = dx, vert_gap = vert_gap, 
+                                    vert_loc = vert_loc-vert_gap, xcenter=nextx,
+                                    pos=pos, parent = root)
+        return pos
+    

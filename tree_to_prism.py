@@ -1,28 +1,50 @@
 import xml.etree.ElementTree as ET
-import networkx as nx
-import matplotlib.pyplot as plt
-import numpy as np
-import pandas as pd
 from tree import Node, Tree
 
-# Get the children of a node
 def parse_children(node):
+    """
+    Parses the children of a given node and returns a list of child nodes.
+
+    Args:
+        node (Element): The parent node whose children need to be parsed.
+
+    Returns:
+        list: A list of child nodes.
+
+    """
     children = []
     for child in node:
         if child.tag == 'node':
             children.append(child)
     return children
 
-# Parse a node
 def parse_node(node):
+    """
+    Parses a node element and returns a Node object.
+
+    Args:
+        node (Element): The XML element representing a node.
+
+    Returns:
+        Node: The parsed Node object.
+
+    """
     refinement = node.attrib['refinement']
     label = node.find('label').text.replace(" ", "")
     comment = node.find('comment').text
     return Node(label, refinement, comment)
 
-# Parse xml file to tree
 def parse_file(file):
-    xml = ET.parse(file) # 'tree/Data_Exfiltration.xml'
+    """
+    Parses an XML file and constructs a tree representation.
+
+    Args:
+        file (str): The path to the XML file.
+
+    Returns:
+        Tree: The constructed tree object.
+    """
+    xml = ET.parse(file)
     r = xml.find('node')
 
     root = parse_node(r)
@@ -42,9 +64,23 @@ def parse_file(file):
             
     return tree
 
-
-# Get info from the dataframe
 def get_info(df):
+    """
+    Extracts information from a DataFrame and returns relevant data.
+
+    Args:
+        df (pandas.DataFrame): The input DataFrame containing the information.
+
+    Returns:
+        tuple: A tuple containing the following elements:
+            - goal (str): The goal extracted from the DataFrame.
+            - actions_to_goal (set): A set of actions leading to the goal.
+            - list_initial (list): A list of initial labels.
+            - attacker_actions (dict): A dictionary of attacker actions with their properties.
+            - defender_actions (dict): A dictionary of defender actions with their properties.
+            - df_attacker (pandas.DataFrame): The filtered DataFrame for attacker actions.
+            - df_defender (pandas.DataFrame): The filtered DataFrame for defender actions.
+    """
     goal = df.loc[df["Type"] == "Goal"]["Label"].values[0]
     actions_to_goal = set(df.loc[df["Parent"] == goal]["Action"].values)
 
@@ -72,6 +108,7 @@ def get_info(df):
         
         if refinement == "conjunctive" and row["Type"] == "Attribute":
             preconditions = df.loc[row["Parent"] == df["Label"]]["Children"].values[0]
+            preconditions = [p for p in preconditions if row["Role"]==df.loc[df["Label"] == p]["Role"].values[0]]
         elif row["Type"] == "Attribute":
             preconditions = [row["Label"]]
         else:
@@ -95,9 +132,16 @@ def get_info(df):
                 
     return goal, actions_to_goal, list_initial, attacker_actions, defender_actions, df_attacker, df_defender
 
-
-# Get the string of the prism model
 def get_prism_model(tree):
+    """
+    Converts a tree object into a PRISM model.
+
+    Args:
+        tree: The tree object to be converted.
+
+    Returns:
+        A string representing the PRISM model.
+    """
     df = tree.to_dataframe()
     goal, actions_to_goal, list_initial, attacker_actions, defender_actions, df_attacker, df_defender = get_info(df)
     text = "smg\n\nplayer attacker\n\tattacker,\n\t"
