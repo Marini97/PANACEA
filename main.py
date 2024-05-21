@@ -8,6 +8,7 @@ def main():
     args = parser.parse_args()
 
     tree = tp.parse_file(args.input)
+    tree.prune("AccesstoReverseShell")
     prism_model = tp.get_prism_model(tree)
     tp.save_prism_model(prism_model, args.output)
     

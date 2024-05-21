@@ -31,7 +31,10 @@ def parse_node(node):
     """
     refinement = node.attrib['refinement']
     label = node.find('label').text.replace(" ", "")
-    comment = node.find('comment').text
+    try:
+        comment = node.find('comment').text
+    except AttributeError:
+        comment = ""
     return Node(label, refinement, comment)
 
 def parse_file(file):
@@ -95,7 +98,7 @@ def get_info(df):
     # df actions with preconditions, effect and costs
     attacker_actions = {}
     defender_actions = {}
-
+    print(goal)
     for _, row in df.iterrows():
         action = row["Action"]
         
@@ -105,6 +108,7 @@ def get_info(df):
         effect = row["Parent"]
         cost = row["Cost"]
         refinement = df.loc[df['Label'] == effect]["Refinement"].values[0]
+        time = row["Time"]
         
         if refinement == "conjunctive" and row["Type"] == "Attribute":
             preconditions = df.loc[row["Parent"] == df["Label"]]["Children"].values[0]
@@ -120,6 +124,7 @@ def get_info(df):
                 "preconditions" : preconditions, 
                 "effect" : effect, 
                 "cost" : cost,
+                "time" : time,
                 "refinement" : refinement}
         elif action in attacker_actions.keys():
             attacker_actions[action]["preconditions"] += preconditions
@@ -128,6 +133,7 @@ def get_info(df):
                     "preconditions" : preconditions, 
                     "effect" : effect, 
                     "cost" : cost,
+                    "time" : time,
                     "refinement" : refinement}
                 
     return goal, actions_to_goal, list_initial, attacker_actions, defender_actions, df_attacker, df_defender
@@ -235,6 +241,139 @@ def get_prism_model(tree):
         text += f"\t[{a}] true : 500;\n"
     for a in defender_actions.keys():
         text += f"\t[{a}] true : {defender_actions[a]['cost']};\n"
+          
+    text += "\nendrewards"
+
+    return text
+
+def get_prism_model_time(tree):
+    """
+    Converts a tree object into a PRISM model with time.
+
+    Args:
+        tree: The tree object to be converted.
+
+    Returns:
+        A string representing the PRISM model.
+    """
+    df = tree.to_dataframe()
+    goal, actions_to_goal, list_initial, attacker_actions, defender_actions, df_attacker, df_defender = get_info(df)
+    attacker_max_time = max(df_attacker["Time"].values)
+    defender_max_time = max(df_defender["Time"].values)
+    
+    text = "smg\n\nplayer attacker\n\tattacker, [wait1],\n\t"
+
+    for a in attacker_actions.keys():
+        text += f"[start{a}], [end{a}], "
+        
+    text = text[:-2]
+    text += "\nendplayer\nplayer defender\n\tdefender, [wait2],\n\t"
+
+    for a in defender_actions.keys():
+        text += f"[start{a}], [end{a}], "
+    
+    text = text[:-2]   
+    text += "\nendplayer\n\nglobal sched : [1..2];\n\n"
+
+    text += f'global {goal} : bool;\nlabel "terminate" = {goal}=true;\n\n'
+
+    for a in set(df_attacker.loc[df_attacker["Type"] == "Attribute"]["Label"].values):
+        text += "global " + a + " : bool;\n"
+        
+    for a in set(list_initial):
+        text += "global " + a + " : bool init true;\n"
+
+    text += "\nmodule attacker\n\n"
+
+    for a in set(df_attacker["Action"].values):
+        text += f"\tprogress{a} : bool;\n"
+        
+    text += "\n"
+    text += f"\ttime1 : [-1..{attacker_max_time}];\n"
+    text += f"\t[wait1] sched=1 & time1>0 -> (sched'=2) & (time1'=time1-1);\n\n"
+
+    for a in attacker_actions.keys():
+        preconditions = attacker_actions[a]["preconditions"]
+        effect = attacker_actions[a]["effect"]
+        time = attacker_actions[a]["time"]
+        
+        if attacker_actions[a]["refinement"] == "disjunctive":
+            refinement = "|"
+            fail_refinement = "&"
+        else:
+            refinement = "&"
+            fail_refinement = "|"
+        
+        # check if the node is a leaf
+        precon = ""
+        fail = ""
+        if preconditions != []:
+            precon += " & ("
+            fail += " & ("
+            for p in set(preconditions):
+                precon += f"{p} {refinement} "
+                fail += f"!{p} {fail_refinement} "
+            precon = f"{precon[:-3]})"
+            fail = f"{fail[:-3]})"
+            
+        text += f"\t[start{a}] sched=1 & time1<0 & !progress{a} & !{goal} & !{effect}{precon} -> (sched'=2) & (time1'={time}) & (progress{a}'=true);\n"
+        text += f"\t[end{a}] sched=1 & time1=0 & progress{a} & !{goal} & !{effect}{precon} -> (time1'=time1-1) & (progress{a}'=false) & ({effect}'=true);\n"
+        if preconditions != []:
+            text += f"\t[fail{a}] sched=1 & time1=0 & progress{a} & !{goal} & !{effect}{fail} -> (time1'=time1-1) & (progress{a}'=false);\n\n"
+        
+    text += "\nendmodule\n\nmodule defender\n\n"
+
+    defender_attributes = set(df_defender.loc[df_defender["Type"] == "Attribute"]["Label"].values)
+    for a in defender_attributes:
+        text += f"\t{a} : bool;\n"
+    
+    text += "\n"
+    for a in set(df_defender["Action"].values):
+        text += f"\tprogress{a} : bool;\n"
+        
+    text += f"\n\ttime2 : [-1..{defender_max_time}];\n"
+    text += f"\t[wait2] sched=2 & time2>0 -> (sched'=1) & (time2'=time2-1);\n\n"
+        
+    for a in defender_actions.keys():
+        preconditions = defender_actions[a]["preconditions"]
+        effect = defender_actions[a]["effect"]
+        time = defender_actions[a]["time"]
+        
+        if defender_actions[a]["refinement"] == "disjunctive":
+            refinement = "|"
+        else:
+            refinement = "&"
+            
+        if effect in defender_attributes:
+            precon = ""
+            if preconditions != []:
+                precon += " & ("
+                for p in set(preconditions):
+                    precon += f"{p} {refinement} "
+                precon = f"{precon[:-3]})"
+            text += f"\t[start{a}] sched=2 & time2<0 & !progress{a} & !{goal} & !{effect}{precon} -> (sched'=1) & (time2'={time}) & (progress{a}'=true);\n"
+            text += f"\t[end{a}] sched=2 & time2=0 & progress{a} & !{goal} & !{effect}{precon} -> (time2'=time2-1) & (progress{a}'=false) & ({effect}'=true);\n"
+        else:
+            precon = ""
+            if preconditions != []:
+                precon += " & ("
+                for p in set(preconditions):
+                    precon += f"{p} {refinement} "
+                precon = f"{precon[:-3]})"
+            text += f"\t[start{a}] sched=2 & time2<0 & !progress{a} & !{goal} & {effect}{precon} -> (sched'=1) & (time2'={time}) & (progress{a}'=true);\n"
+            text += f"\t[end{a}] sched=2 & time2=0 & progress{a} & !{goal} & {effect}{precon} -> (time2'=time2-1) & (progress{a}'=false) & ({effect}'=false);\n"
+        
+    text += '\nendmodule\n\nrewards "attacker"\n\n'
+
+    for a in attacker_actions.keys():
+        text += f"\t[start{a}] true : {attacker_actions[a]['cost']};\n"
+        
+    text += '\nendrewards\n\nrewards "defender"\n\n'
+
+    for a in actions_to_goal:
+        text += f"\t[end{a}] true : {int(attacker_actions[a]['cost'])*10};\n"
+    for a in defender_actions.keys():
+        text += f"\t[start{a}] true : {defender_actions[a]['cost']};\n"
           
     text += "\nendrewards"
 

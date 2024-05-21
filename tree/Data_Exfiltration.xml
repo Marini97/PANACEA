@@ -9,12 +9,14 @@ Role: Attacker</comment>
 			<comment>Type: Attribute
 Action: exfiltrateData
 Cost: 50
+Time: 3
 Role: Attacker</comment>
 			<node refinement="conjunctive">
 				<label>Search Office</label>
 				<comment>Type: Action
 Action: searchOffice
 Cost: 500
+Time: 4
 Role: Attacker</comment>
 			</node>
 			<node refinement="conjunctive">
@@ -22,6 +24,7 @@ Role: Attacker</comment>
 				<comment>Type: Action
 Action: bribe
 Cost: 500
+Time: 2
 Role: Attacker</comment>
 			</node>
 			<node refinement="conjunctive">
@@ -29,6 +32,7 @@ Role: Attacker</comment>
 				<comment>Type: Attribute
 Action: getLoginData
 Cost: 10
+Time: 2
 Role: Attacker</comment>
 				<node refinement="conjunctive">
 					<label>Misconfigured Apache</label>
@@ -39,6 +43,7 @@ Role: Attacker</comment>
 						<comment>Type: Action
 Action: reconfigureApache
 Cost: 30
+Time: 2
 Role: Defender</comment>
 					</node>
 				</node>
@@ -47,18 +52,21 @@ Role: Defender</comment>
 					<comment>Type: Attribute
 Action: getFiles
 Cost: 30
+Time: 2
 Role: Attacker</comment>
 					<node refinement="disjunctive">
 						<label>Reconnaissance</label>
 						<comment>Type: Attribute
 Action: pathTraversal
 Cost: 20
+Time: 2
 Role: Attacker</comment>
 						<node refinement="disjunctive">
 							<label>Web Recon</label>
 							<comment>Type: Action
 Action: webRecon
 Cost: 5
+Time: 1
 Role: Attacker</comment>
 						</node>
 					</node>
@@ -71,6 +79,7 @@ Role: Attacker</comment>
 							<comment>Type: Action
 Action: disableCGIscripts
 Cost: 50
+Time: 2
 Role: Defender</comment>
 						</node>
 					</node>
@@ -83,6 +92,7 @@ Role: Attacker</comment>
 							<comment>Type: Attribute
 Action: updateApache
 Cost: 10
+Time: 1
 Role: Defender</comment>
 							<node refinement="conjunctive">
 								<label>Backup Apache</label>
@@ -93,6 +103,7 @@ Role: Defender</comment>
 									<comment>Type: Action
 Action: backupApache
 Cost: 50
+Time: 2
 Role: Defender</comment>
 								</node>
 							</node>
@@ -101,18 +112,21 @@ Role: Defender</comment>
 								<comment>Type: Attribute
 Action: rebootApache
 Cost: 30
+Time: 2
 Role: Defender</comment>
 								<node refinement="conjunctive">
 									<label>New Apache Version</label>
 									<comment>Type: Attribute
 Action: installApache
 Cost: 20
+Time: 2
 Role: Defender</comment>
 									<node refinement="conjunctive">
 										<label>Check for Apache Updates</label>
 										<comment>Type: Action
 Action: checkApacheUpdates
 Cost: 5
+Time: 1
 Role: Defender</comment>
 									</node>
 								</node>
@@ -125,6 +139,7 @@ Role: Defender</comment>
 					<comment>Type: Action
 Action: protectFiles
 Cost: 25
+Time: 2
 Role: Defender</comment>
 				</node>
 			</node>
@@ -132,7 +147,8 @@ Role: Defender</comment>
 				<label>Change Credentials</label>
 				<comment>Type: Action
 Action: changeCredentials
-Cost: 70
+Cost: 500
+Time: 4
 Role: Defender</comment>
 			</node>
 		</node>
@@ -141,24 +157,28 @@ Role: Defender</comment>
 			<comment>Type: Attribute
 Action: exfiltrateData
 Cost: 50
+Time: 3
 Role: Attacker</comment>
 			<node refinement="conjunctive">
 				<label>Access to Reverse Shell</label>
 				<comment>Type: Attribute
 Action: bufferOverflow
 Cost: 30
+Time: 2
 Role: Attacker</comment>
 				<node refinement="disjunctive">
 					<label>Reconnaissance</label>
 					<comment>Type: Attribute
 Action: pathTraversal
 Cost: 20
+Time: 2
 Role: Attacker</comment>
 					<node refinement="disjunctive">
 						<label>Web Recon</label>
 						<comment>Type: Action
 Action: webRecon
 Cost: 5
+Time: 1
 Role: Attacker</comment>
 					</node>
 				</node>
@@ -171,6 +191,7 @@ Role: Attacker</comment>
 						<comment>Type: Action
 Action: disableCGIscripts
 Cost: 50
+Time: 2
 Role: Defender</comment>
 					</node>
 				</node>
@@ -183,6 +204,7 @@ Role: Attacker</comment>
 						<comment>Type: Attribute
 Action: updateApache
 Cost: 10
+Time: 1
 Role: Defender</comment>
 						<node refinement="conjunctive">
 							<label>Backup Apache</label>
@@ -193,6 +215,7 @@ Role: Defender</comment>
 								<comment>Type: Action
 Action: backupApache
 Cost: 50
+Time: 2
 Role: Defender</comment>
 							</node>
 						</node>
@@ -201,18 +224,21 @@ Role: Defender</comment>
 							<comment>Type: Attribute
 Action: rebootApache
 Cost: 30
+Time: 2
 Role: Defender</comment>
 							<node refinement="conjunctive">
 								<label>New Apache Version</label>
 								<comment>Type: Attribute
 Action: installApache
 Cost: 20
+Time: 2
 Role: Defender</comment>
 								<node refinement="conjunctive">
 									<label>Check for Apache Updates</label>
 									<comment>Type: Action
 Action: checkApacheUpdates
 Cost: 5
+Time: 1
 Role: Defender</comment>
 								</node>
 							</node>
@@ -229,6 +255,7 @@ Role: Attacker</comment>
 					<comment>Type: Action
 Action: deactivateDOCKS5Proxy
 Cost: 50
+Time: 1
 Role: Defender</comment>
 				</node>
 			</node>
@@ -241,6 +268,7 @@ Role: Attacker</comment>
 					<comment>Type: Attribute
 Action: updateMySQL
 Cost: 10
+Time: 1
 Role: Defender</comment>
 					<node refinement="conjunctive">
 						<label>Backup MySQL</label>
@@ -251,6 +279,7 @@ Role: Defender</comment>
 							<comment>Type: Action
 Action: backupMySQL
 Cost: 50
+Time: 2
 Role: Defender</comment>
 						</node>
 					</node>
@@ -259,18 +288,21 @@ Role: Defender</comment>
 						<comment>Type: Attribute
 Action: rebootMySQL
 Cost: 30
+Time: 2
 Role: Defender</comment>
 						<node refinement="conjunctive">
 							<label>New MySQL Version</label>
 							<comment>Type: Attribute
 Action: installMySQL
 Cost: 20
+Time: 2
 Role: Defender</comment>
 							<node refinement="conjunctive">
 								<label>Check for MySQL Updates</label>
 								<comment>Type: Action
 Action: checkMySQLUpdates
 Cost: 5
+Time: 1
 Role: Defender</comment>
 							</node>
 						</node>
