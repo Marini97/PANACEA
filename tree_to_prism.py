@@ -98,7 +98,7 @@ def get_info(df):
     # df actions with preconditions, effect and costs
     attacker_actions = {}
     defender_actions = {}
-    print(goal)
+    
     for _, row in df.iterrows():
         action = row["Action"]
         
@@ -238,7 +238,7 @@ def get_prism_model(tree):
     text += '\nendrewards\n\nrewards "defender"\n\n'
 
     for a in actions_to_goal:
-        text += f"\t[{a}] true : 500;\n"
+        text += f"\t[{a}] true : {int(attacker_actions[a]['cost'])*10};\n"
     for a in defender_actions.keys():
         text += f"\t[{a}] true : {defender_actions[a]['cost']};\n"
           
@@ -379,11 +379,84 @@ def get_prism_model_time(tree):
 
     return text
 
+def get_prism_model_single_agent(tree):
+    """
+    Converts a tree object into a PRISM model with a single agent.
+
+    Args:
+        tree: The tree object to be converted.
+
+    Returns:
+        A string representing the PRISM model.
+    """
+    df = tree.to_dataframe()
+    goal, actions_to_goal, list_initial, attacker_actions, defender_actions, df_attacker, df_defender = get_info(df)
+    text = "smg\n\t"
+    text += "\nplayer defender\n\tdefender,\n\t"
+
+    for a in defender_actions.keys():
+        text += f"[{a}], "
+    
+    text = text[:-2]   
+    text += "\nendplayer\n\n"
+
+    text += f'global {goal} : bool;\nlabel "terminate" = {goal}=true;\n\n'
+
+    for a in set(df_attacker.loc[df_attacker["Type"] == "Attribute"]["Label"].values):
+        text += "global " + a + " : bool;\n"
+        
+    for a in set(list_initial):
+        text += "global " + a + " : bool init true;\n"
+        
+    text += "\nmodule defender\n\n"
+
+    defender_attributes = set(df_defender.loc[df_defender["Type"] == "Attribute"]["Label"].values)
+    for a in defender_attributes:
+        text += f"\t{a} : bool;\n"
+        
+    text += "\n"
+        
+    for a in defender_actions.keys():
+        preconditions = defender_actions[a]["preconditions"]
+        effect = defender_actions[a]["effect"]
+        if defender_actions[a]["refinement"] == "disjunctive":
+            refinement = "|"
+        else:
+            refinement = "&"
+            
+        if effect in defender_attributes:
+            text += f"\t[{a}] sched=2 & !{goal} & !{effect}"
+            if preconditions != []:
+                text += " & ("
+                for p in set(preconditions):
+                    text += f"{p} {refinement} "
+                text = f"{text[:-3]})"
+            text += f" -> ({effect}'=true) & (sched'=1);\n"
+        else:
+            text += f"\t[{a}] sched=2 & !{goal} & {effect}"
+            if preconditions != []:
+                text += " & ("
+                for p in set(preconditions):
+                    text += f"{p} {refinement} "
+                text = f"{text[:-3]})"
+            text += f" -> ({effect}'=false) & (sched'=1);\n"
+        
+    text += '\nendmodule\n'
+    text += '\nrewards "defender"\n\n'
+
+    for a in actions_to_goal:
+        text += f"\t[{a}] true : {int(attacker_actions[a]['cost'])*10};\n"
+    for a in defender_actions.keys():
+        text += f"\t[{a}] true : {defender_actions[a]['cost']};\n"
+          
+    text += "\nendrewards"
+
+    return text   
+
 def save_prism_model(prism_model, file):
     with open(file, 'w') as f:
         f.write(prism_model)
         f.close()
-    save_prism_properties(file.replace('.prism', '.props'))
     
 def save_prism_properties(file):
     with open(file, 'w') as f:

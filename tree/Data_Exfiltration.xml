@@ -147,8 +147,8 @@ Role: Defender</comment>
 				<label>Change Credentials</label>
 				<comment>Type: Action
 Action: changeCredentials
-Cost: 500
-Time: 4
+Cost: 100
+Time: 2
 Role: Defender</comment>
 			</node>
 		</node>

@@ -109,6 +109,9 @@ class Tree:
 
         Args:
             label (str): The label of the subtree to keep.
+            
+        Returns:
+            Tree: a new pruned tree object.
         """    
         path = self.get_path_to_node(label)
         tree = Tree()
