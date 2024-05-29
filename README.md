@@ -22,6 +22,9 @@ pip install -r requirements.txt
 To use the project, you need to run the script `main.py` with the following arguments:
 - `--input` or `-i`: the path to the XML file from ADTool
 - `--output` or `-o`: the path to the output file for the PRISM model
+- `--props`: generate the properties for the PRISM model
+- `--prune` or `-p`: name of the subtree root to keep
+- `--time` or `-t`: generate a time-based PRISM model
 
 ```bash
 python main.py --input input.xml --output output.prism
