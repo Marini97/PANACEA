@@ -1,3 +1,0 @@
-// The minimum expected cost that the defender can guarantee to reach a state labeled "terminate"
-<<defender>>R{"defender"}min=? [ F "terminate" ]
-
