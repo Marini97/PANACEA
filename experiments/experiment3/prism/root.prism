@@ -1,0 +1,136 @@
+smg
+
+player attacker
+	attacker,
+	[a1], [a2], [a4], [a5], [a6], [a7], [a8], [a62], [a72], [a82], [a63], [a73], [a24], [a92], [a102], [a112], [a93], [a103], [a54]
+endplayer
+player defender
+	defender,
+	[c1], [c2], [c3], [c4], [c6], [c7], [c8], [c62], [c72], [c82], [c63], [c73], [c24]
+endplayer
+
+global sched : [1..2];
+
+global root : [0..1];
+label "terminate" = root=1;
+
+global A_62 : [0..2];
+global A_82 : [0..2];
+global A_72 : [0..2];
+global A_73 : [0..2];
+global A_7 : [0..2];
+global A_8 : [0..2];
+global A_24 : [0..2];
+global A_1 : [0..2];
+global A_6 : [0..2];
+global A_63 : [0..2];
+global A_4 : [0..2];
+global A_2 : [0..2];
+global A_3 : [1..2];
+
+module attacker
+
+	a72 : bool;
+	a4 : bool;
+	a63 : bool;
+	a54 : bool;
+	a102 : bool;
+	a112 : bool;
+	a103 : bool;
+	a92 : bool;
+	a1 : bool;
+	a73 : bool;
+	a5 : bool;
+	a62 : bool;
+	a93 : bool;
+	a6 : bool;
+	a2 : bool;
+	a82 : bool;
+	a7 : bool;
+	a8 : bool;
+	a24 : bool;
+
+	[a1] sched=1 & !root=1 & root=0 & !a1 & (A_1=1) -> (root'=1) & (a1'=true) & (sched'=2);
+	[a2] sched=1 & !root=1 & root=0 & !a2 & (A_2=1) -> (root'=1) & (a2'=true) & (sched'=2);
+	[a4] sched=1 & !root=1 & A_1=0 & !a4 & (A_3=1 & A_4=1) -> (A_1'=1) & (a4'=true) & (sched'=2);
+	[a5] sched=1 & !root=1 & A_2=0 & !a5 -> (A_2'=1) & (a5'=true) & (sched'=2);
+	[a6] sched=1 & !root=1 & A_4=0 & !a6 & (A_6=1) -> (A_4'=1) & (a6'=true) & (sched'=2);
+	[a7] sched=1 & !root=1 & A_4=0 & !a7 & (A_7=1) -> (A_4'=1) & (a7'=true) & (sched'=2);
+	[a8] sched=1 & !root=1 & A_4=0 & !a8 & (A_8=1) -> (A_4'=1) & (a8'=true) & (sched'=2);
+	[a62] sched=1 & !root=1 & A_6=0 & !a62 & (A_62=1) -> (A_6'=1) & (a62'=true) & (sched'=2);
+	[a72] sched=1 & !root=1 & A_6=0 & !a72 & (A_72=1) -> (A_6'=1) & (a72'=true) & (sched'=2);
+	[a82] sched=1 & !root=1 & A_6=0 & !a82 & (A_82=1) -> (A_6'=1) & (a82'=true) & (sched'=2);
+	[a63] sched=1 & !root=1 & A_7=0 & !a63 & (A_63=1) -> (A_7'=1) & (a63'=true) & (sched'=2);
+	[a73] sched=1 & !root=1 & A_7=0 & !a73 & (A_73=1) -> (A_7'=1) & (a73'=true) & (sched'=2);
+	[a24] sched=1 & !root=1 & A_8=0 & !a24 & (A_24=1) -> (A_8'=1) & (a24'=true) & (sched'=2);
+	[a92] sched=1 & !root=1 & A_62=0 & !a92 -> (A_62'=1) & (a92'=true) & (sched'=2);
+	[a102] sched=1 & !root=1 & A_72=0 & !a102 -> (A_72'=1) & (a102'=true) & (sched'=2);
+	[a112] sched=1 & !root=1 & A_82=0 & !a112 -> (A_82'=1) & (a112'=true) & (sched'=2);
+	[a93] sched=1 & !root=1 & A_63=0 & !a93 -> (A_63'=1) & (a93'=true) & (sched'=2);
+	[a103] sched=1 & !root=1 & A_73=0 & !a103 -> (A_73'=1) & (a103'=true) & (sched'=2);
+	[a54] sched=1 & !root=1 & A_24=0 & !a54 -> (A_24'=1) & (a54'=true) & (sched'=2);
+
+endmodule
+
+module defender
+
+
+	[c1] sched=2 & !root=1 & !A_1=2 -> (A_1'=2) & (sched'=1);
+	[c2] sched=2 & !root=1 & !A_2=2 -> (A_2'=2) & (sched'=1);
+	[c3] sched=2 & !root=1 & !A_3=2 -> (A_3'=2) & (sched'=1);
+	[c4] sched=2 & !root=1 & !A_4=2 -> (A_4'=2) & (sched'=1);
+	[c6] sched=2 & !root=1 & !A_6=2 -> (A_6'=2) & (sched'=1);
+	[c7] sched=2 & !root=1 & !A_7=2 -> (A_7'=2) & (sched'=1);
+	[c8] sched=2 & !root=1 & !A_8=2 -> (A_8'=2) & (sched'=1);
+	[c62] sched=2 & !root=1 & !A_62=2 -> (A_62'=2) & (sched'=1);
+	[c72] sched=2 & !root=1 & !A_72=2 -> (A_72'=2) & (sched'=1);
+	[c82] sched=2 & !root=1 & !A_82=2 -> (A_82'=2) & (sched'=1);
+	[c63] sched=2 & !root=1 & !A_63=2 -> (A_63'=2) & (sched'=1);
+	[c73] sched=2 & !root=1 & !A_73=2 -> (A_73'=2) & (sched'=1);
+	[c24] sched=2 & !root=1 & !A_24=2 -> (A_24'=2) & (sched'=1);
+
+endmodule
+
+rewards "attacker"
+
+	[a1] true : 50;
+	[a2] true : 500;
+	[a4] true : 50;
+	[a5] true : 500;
+	[a6] true : 100;
+	[a7] true : 30;
+	[a8] true : 10;
+	[a62] true : 100;
+	[a72] true : 30;
+	[a82] true : 10;
+	[a63] true : 100;
+	[a73] true : 30;
+	[a24] true : 500;
+	[a92] true : 100;
+	[a102] true : 30;
+	[a112] true : 10;
+	[a93] true : 100;
+	[a103] true : 30;
+	[a54] true : 500;
+
+endrewards
+
+rewards "defender"
+
+	[a2] true : 5000;
+	[a1] true : 500;
+	[c1] true : 100;
+	[c2] true : 500;
+	[c3] true : 70;
+	[c4] true : 50;
+	[c6] true : 30;
+	[c7] true : 40;
+	[c8] true : 20;
+	[c62] true : 30;
+	[c72] true : 40;
+	[c82] true : 20;
+	[c63] true : 30;
+	[c73] true : 40;
+	[c24] true : 500;
+
+endrewards

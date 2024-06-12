@@ -1,0 +1,6 @@
+action,step,sched,DataExfiltration,AccesstoSensitiveFiles,AccesstoReverseShell,Reconnaissance,AccesstoMySQL,ExecuteArbitraryCode,CGIscriptsenabled,ApacheHTTPServerVersion,SOCKS5ProxyActive,MySQLServerVersion,MisconfiguredApache,searchOffice,getLoginData,pathTraversal,exfiltrateData,webRecon,getFiles,bufferOverflow,bribe,BackupApache,InstalledNewMySQL,UpdateMySQL,InstalledNewApache,UpdateApache,BackupMySQL,NewApacheVersion,NewMySQLVersion,state_reward1,transition_reward1,state_reward2,transition_reward2
+-,0,1,0,0,0,0,0,0,1,1,1,1,1,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,0,0,0,0,0,0,0,0,0,500,0,0
+[searchOffice],1,2,0,0,0,0,1,0,1,1,1,1,1,TRUE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,0,0,0,0,0,0,0,0,0,0,0,200
+[changeCredentials],2,1,0,0,0,0,2,0,1,1,1,1,1,TRUE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,0,0,0,0,0,0,0,0,0,5,0,0
+[webRecon],3,2,0,0,0,1,2,0,1,1,1,1,1,TRUE,FALSE,FALSE,FALSE,TRUE,FALSE,FALSE,FALSE,0,0,0,0,0,0,0,0,0,0,0,70
+[disableCGIscripts],4,1,0,0,0,1,2,0,2,1,1,1,1,TRUE,FALSE,FALSE,FALSE,TRUE,FALSE,FALSE,FALSE,0,0,0,0,0,0,0,0,0,?,0,?

@@ -1,0 +1,3 @@
+// The minimum expected cost that the attacker can guarantee to reach a state labeled "terminate"
+<<attacker>>R{"attacker"}min=? [ F "terminate" ]
+

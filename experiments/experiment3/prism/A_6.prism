@@ -1,0 +1,68 @@
+smg
+
+player attacker
+	attacker,
+	[a62], [a72], [a82], [a92], [a102], [a112]
+endplayer
+player defender
+	defender,
+	[c62], [c72], [c82]
+endplayer
+
+global sched : [1..2];
+
+global A_6 : [0..1];
+label "terminate" = A_6=1;
+
+global A_82 : [0..2];
+global A_62 : [0..2];
+global A_72 : [0..2];
+
+module attacker
+
+	a112 : bool;
+	a92 : bool;
+	a82 : bool;
+	a72 : bool;
+	a62 : bool;
+	a102 : bool;
+
+	[a62] sched=1 & !A_6=1 & A_6=0 & !a62 & (A_62=1) -> (A_6'=1) & (a62'=true) & (sched'=2);
+	[a72] sched=1 & !A_6=1 & A_6=0 & !a72 & (A_72=1) -> (A_6'=1) & (a72'=true) & (sched'=2);
+	[a82] sched=1 & !A_6=1 & A_6=0 & !a82 & (A_82=1) -> (A_6'=1) & (a82'=true) & (sched'=2);
+	[a92] sched=1 & !A_6=1 & A_62=0 & !a92 -> (A_62'=1) & (a92'=true) & (sched'=2);
+	[a102] sched=1 & !A_6=1 & A_72=0 & !a102 -> (A_72'=1) & (a102'=true) & (sched'=2);
+	[a112] sched=1 & !A_6=1 & A_82=0 & !a112 -> (A_82'=1) & (a112'=true) & (sched'=2);
+
+endmodule
+
+module defender
+
+
+	[c62] sched=2 & !A_6=1 & !A_62=2 -> (A_62'=2) & (sched'=1);
+	[c72] sched=2 & !A_6=1 & !A_72=2 -> (A_72'=2) & (sched'=1);
+	[c82] sched=2 & !A_6=1 & !A_82=2 -> (A_82'=2) & (sched'=1);
+
+endmodule
+
+rewards "attacker"
+
+	[a62] true : 100;
+	[a72] true : 30;
+	[a82] true : 10;
+	[a92] true : 100;
+	[a102] true : 30;
+	[a112] true : 10;
+
+endrewards
+
+rewards "defender"
+
+	[a62] true : 1000;
+	[a72] true : 300;
+	[a82] true : 100;
+	[c62] true : 30;
+	[c72] true : 40;
+	[c82] true : 20;
+
+endrewards

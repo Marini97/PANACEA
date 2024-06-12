@@ -1,0 +1,9 @@
+// The minimum probability to reach a state labeled "terminate"
+Pmin=? [ F "terminate" ]
+
+// The minimum expected cost that attacker and defender can guarantee to reach a state labeled "terminate"
+<<attacker>>R{"attacker"}min=? [ F "terminate" ]
+
+// Each agent tries to get the minimum expected cost to reach a terminate state
+<<attacker,defender>>R{"attacker"}min=? [ F "terminate" ]+R{"defender"}min=? [ F "deadlock" ]
+

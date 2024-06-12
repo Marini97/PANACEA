@@ -1,0 +1,9 @@
+action step sched DataExfiltration AccesstoMySQL Reconnaissance AccesstoReverseShell ExecuteArbitraryCode AccesstoSensitiveFiles SOCKS5ProxyActive CGIscriptsenabled ApacheHTTPServerVersion MisconfiguredApache MySQLServerVersion webRecon getLoginData bribe pathTraversal getFiles exfiltrateData bufferOverflow searchOffice BackupMySQL InstalledNewApache NewMySQLVersion UpdateApache NewApacheVersion InstalledNewMySQL UpdateMySQL BackupApache state_reward1 transition_reward1 state_reward2 transition_reward2
+- 0 1 0 0 0 0 0 0 1 1 1 1 1 false false false false false false false false 0 0 0 0 0 0 0 0 0.0 5.0 0.0 0.0
+[webRecon] 1 2 0 0 1 0 0 0 1 1 1 1 1 true false false false false false false false 0 0 0 0 0 0 0 0 0.0 0.0 0.0 5.0
+[checkMySQLUpdates] 2 1 0 0 1 0 0 0 1 1 1 1 1 true false false false false false false false 0 0 1 0 0 0 0 0 0.0 20.0 0.0 0.0
+[pathTraversal] 3 2 0 0 1 1 0 0 1 1 1 1 1 true false false true false false false false 0 0 1 0 0 0 0 0 0.0 0.0 0.0 5.0
+[checkApacheUpdates] 4 1 0 0 1 1 0 0 1 1 1 1 1 true false false true false false false false 0 0 1 0 1 0 0 0 0.0 30.0 0.0 0.0
+[bufferOverflow] 5 2 0 0 1 1 1 0 1 1 1 1 1 true false false true false false true false 0 0 1 0 1 0 0 0 0.0 0.0 0.0 20.0
+[installMySQL] 6 1 0 0 1 1 1 0 1 1 1 1 1 true false false true false false true false 0 0 1 0 1 1 0 0 0.0 50.0 0.0 500.0
+[exfiltrateData] 7 2 1 0 1 1 1 0 1 1 1 1 1 true false false true false true true false 0 0 1 0 1 1 0 0 0.0 ? 0.0 ?
