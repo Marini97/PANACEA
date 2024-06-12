@@ -1,9 +1,0 @@
-tree,using_time,number_tree_nodes,number_reachable_states,number_transitions,time_model_construction,time_property_checking,reward
-root,FALSE,34,7317593,27667938,84.03,301.66,690
-A_1,FALSE,29,664808,2083981,5.033,15.318,620
-A_4,FALSE,25,100157,286281,0.585,2.709,210
-A_6,FALSE,10,47,73,0.001,0.001,110
-root,TRUE,34,,,,,
-A_1,TRUE,29,14010128,17780155,140.597,506.362,640
-A_4,TRUE,25,2735117,3408750,19.482,87.464,230
-A_6,TRUE,10,622,702,0.001,0.01,110

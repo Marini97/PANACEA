@@ -1,0 +1,103 @@
+PRISM-games
+===========
+
+Version: 3.2.1 (based on PRISM 4.8.dev)
+Date: Tue Jun 11 23:22:45 CEST 2024
+Hostname: kathara-Virtual-Machine
+Memory limits: cudd=10g, java(heap)=480g
+Command line: prism-games -javamaxmem 480g -cuddmaxmem 10g experiments/experiment3/prism/A_1.prism experiments/experiment3/prism/properties.props -prop 1 -exportstrat results/A_1/A_1.dot
+
+Parsing model file "experiments/experiment3/prism/A_1.prism"...
+
+Type:        SMG
+Modules:     attacker defender
+Variables:   sched A_1 A_62 A_82 A_72 A_73 A_7 A_8 A_24 A_63 A_6 A_4 A_3 a112 a103 a6 a92 a82 a72 a4 a63 a73 a7 a54 a62 a93 a102 a8 a24
+
+Parsing properties file "experiments/experiment3/prism/properties.props"...
+
+1 property:
+(1) <<attacker,defender>>R{"attacker"}min=? [ F "terminate" ]+R{"defender"}min=? [ F "deadlock" ]
+
+---------------------------------------------------------------------
+
+Model checking: <<attacker,defender>>R{"attacker"}min=? [ F "terminate" ]+R{"defender"}min=? [ F "deadlock" ]
+
+Warning: Switching to explicit engine to allow strategy generation.
+
+Building model...
+
+Computing reachable states... 204106 451296 786144 states
+Reachable states exploration and model construction done in 8.789 secs.
+Sorting reachable states list...
+
+Time for model construction: 10.81 seconds.
+
+Warning: Deadlocks detected and fixed in 133398 states
+
+Type:        SMG
+States:      786144 (1 initial)
+Transitions: 2674280
+Choices:     2674280
+Max/avg:     11/3.40
+Building reward structure...
+
+Starting expected reachability...
+Starting Prob1 (maxmin)...
+Prob1 (maxmin) took 18 iterations and 15.821 seconds.
+target=87802, inf=374817, rest=323525
+Computing the upper bound where 5.0 is used instead of 0.0
+Starting value iteration (minmax)...
+Value iteration (minmax) took 13 iterations and 4.938 seconds.
+Computed an over-approximation of the solution (in 4 seconds), this will now be used to get the solution
+Starting value iteration (minmax)...
+Value iteration (minmax) took 9 iterations and 3.648 seconds.
+Expected reachability took 24.637 seconds.
+Building reward structure...
+
+Starting expected reachability...
+Starting Prob1 (maxmax)...
+Prob1 (maxmax) took 9 iterations and 9.181 seconds.
+target=133398, inf=0, rest=652746
+Computing the upper bound where 5.0 is used instead of 0.0
+Starting value iteration (minmin)...
+Value iteration (minmin) took 11 iterations and 7.306 seconds.
+Computed an over-approximation of the solution (in 7 seconds), this will now be used to get the solution
+Starting value iteration (minmin)...
+Value iteration (minmin) took 10 iterations and 6.691 seconds.
+Expected reachability took 23.323 seconds.
+
+Value in the initial state: 260.0
+
+Time for model checking: 49.27 seconds.
+
+Result: 260.0 (exact floating point)
+
+Exporting strategy as a dot file to file "results/A_1/A_1.dot"...
+
+---------------------------------------------------------------------
+
+Note: There were 2 warnings during computation.
+
+	Command being timed: "prism-games-3.2.1-linux64-x86/bin/prism -javamaxmem 480g -cuddmaxmem 10g experiments/experiment3/prism/A_1.prism experiments/experiment3/prism/properties.props -prop 1 -exportstrat results/A_1/A_1.dot"
+	User time (seconds): 111.35
+	System time (seconds): 7.38
+	Percent of CPU this job got: 190%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 1:02.25
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 13561352
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 1
+	Minor (reclaiming a frame) page faults: 159245
+	Voluntary context switches: 18373
+	Involuntary context switches: 721
+	Swaps: 0
+	File system inputs: 16
+	File system outputs: 448
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 0

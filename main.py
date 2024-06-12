@@ -1,5 +1,8 @@
 import argparse
+import os
+
 import tree_to_prism as tp
+
 
 def main():
     parser = argparse.ArgumentParser(description='Process XML file from ADTool and generate PRISM model')
@@ -22,8 +25,8 @@ def main():
     if args.props:
         # save the properties file in the same directory as the output file
         path_output = "/".join(file.split("/")[:-1])
-        tp.save_prism_properties(f"{path_output}properties.props")
+        tp.save_prism_properties(os.path.join(path_output, "properties.props"))
 
-    
+
 if __name__ == '__main__':
     main()

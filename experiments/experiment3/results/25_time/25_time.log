@@ -1,0 +1,103 @@
+PRISM-games
+===========
+
+Version: 3.2.1 (based on PRISM 4.8.dev)
+Date: Tue Jun 11 23:56:06 CEST 2024
+Hostname: kathara-Virtual-Machine
+Memory limits: cudd=10g, java(heap)=480g
+Command line: prism-games -javamaxmem 480g -cuddmaxmem 10g experiments/experiment3/prism/A_4_time.prism experiments/experiment3/prism/properties.props -prop 1 -exportstrat results/A_4_time/A_4_time.dot
+
+Parsing model file "experiments/experiment3/prism/A_4_time.prism"...
+
+Type:        SMG
+Modules:     attacker defender
+Variables:   sched A_4 A_62 A_82 A_72 A_73 A_7 A_8 A_24 A_63 A_6 progressa112 progressa103 progressa6 progressa92 progressa82 progressa72 progressa63 progressa73 progressa54 progressa7 progressa62 progressa93 progressa102 progressa8 progressa24 time1 progressc8 progressc62 progressc63 progressc6 progressc82 progressc73 progressc7 progressc24 progressc72 time2
+
+Parsing properties file "experiments/experiment3/prism/properties.props"...
+
+1 property:
+(1) <<attacker,defender>>R{"attacker"}min=? [ F "terminate" ]+R{"defender"}min=? [ F "deadlock" ]
+
+---------------------------------------------------------------------
+
+Model checking: <<attacker,defender>>R{"attacker"}min=? [ F "terminate" ]+R{"defender"}min=? [ F "deadlock" ]
+
+Warning: Switching to explicit engine to allow strategy generation.
+
+Building model...
+
+Computing reachable states... 296603 612232 944035 1259474 1601642 1921149 2231541 2577662 2735117 states
+Reachable states exploration and model construction done in 25.476 secs.
+Sorting reachable states list...
+
+Time for model construction: 29.031 seconds.
+
+Warning: Deadlocks detected and fixed in 40434 states
+
+Type:        SMG
+States:      2735117 (1 initial)
+Transitions: 3408750
+Choices:     3408750
+Max/avg:     9/1.25
+Building reward structure...
+
+Starting expected reachability...
+Starting Prob1 (maxmin)...
+Prob1 (maxmin) took 74 iterations and 80.239 seconds.
+target=39302, inf=620872, rest=2074943
+Computing the upper bound where 5.0 is used instead of 0.0
+Starting value iteration (minmax)...
+Value iteration (minmax) took 42 iterations and 29.935 seconds.
+Computed an over-approximation of the solution (in 29 seconds), this will now be used to get the solution
+Starting value iteration (minmax)...
+Value iteration (minmax) took 37 iterations and 26.28 seconds.
+Expected reachability took 136.769 seconds.
+Building reward structure...
+
+Starting expected reachability...
+Starting Prob1 (maxmax)...
+Prob1 (maxmax) took 31 iterations and 34.019 seconds.
+target=40434, inf=0, rest=2694683
+Computing the upper bound where 10.0 is used instead of 0.0
+Starting value iteration (minmin)...
+Value iteration (minmin) took 36 iterations and 34.159 seconds.
+Computed an over-approximation of the solution (in 34 seconds), this will now be used to get the solution
+Starting value iteration (minmin)...
+Value iteration (minmin) took 36 iterations and 36.046 seconds.
+Expected reachability took 104.474 seconds.
+
+Value in the initial state: 230.0
+
+Time for model checking: 244.096 seconds.
+
+Result: 230.0 (exact floating point)
+
+Exporting strategy as a dot file to file "results/A_4_time/A_4_time.dot"...
+
+---------------------------------------------------------------------
+
+Note: There were 2 warnings during computation.
+
+	Command being timed: "prism-games-3.2.1-linux64-x86/bin/prism -javamaxmem 480g -cuddmaxmem 10g experiments/experiment3/prism/A_4_time.prism experiments/experiment3/prism/properties.props -prop 1 -exportstrat results/A_4_time/A_4_time.dot"
+	User time (seconds): 517.08
+	System time (seconds): 17.58
+	Percent of CPU this job got: 193%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 4:36.56
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 51592404
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 0
+	Minor (reclaiming a frame) page faults: 306397
+	Voluntary context switches: 32195
+	Involuntary context switches: 2469
+	Swaps: 0
+	File system inputs: 0
+	File system outputs: 336
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 0

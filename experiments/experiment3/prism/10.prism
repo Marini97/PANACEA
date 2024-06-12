@@ -14,18 +14,18 @@ global sched : [1..2];
 global A_6 : [0..1];
 label "terminate" = A_6=1;
 
-global A_82 : [0..2];
 global A_62 : [0..2];
+global A_82 : [0..2];
 global A_72 : [0..2];
 
 module attacker
 
-	a112 : bool;
 	a92 : bool;
-	a82 : bool;
-	a72 : bool;
-	a62 : bool;
 	a102 : bool;
+	a72 : bool;
+	a112 : bool;
+	a82 : bool;
+	a62 : bool;
 
 	[a62] sched=1 & !A_6=1 & A_6=0 & !a62 & (A_62=1) -> (A_6'=1) & (a62'=true) & (sched'=2);
 	[a72] sched=1 & !A_6=1 & A_6=0 & !a72 & (A_72=1) -> (A_6'=1) & (a72'=true) & (sched'=2);
@@ -59,8 +59,8 @@ endrewards
 rewards "defender"
 
 	[a62] true : 1000;
-	[a72] true : 300;
 	[a82] true : 100;
+	[a72] true : 300;
 	[c62] true : 30;
 	[c72] true : 40;
 	[c82] true : 20;

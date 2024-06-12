@@ -14,36 +14,36 @@ global sched : [1..2];
 global A_1 : [0..1];
 label "terminate" = A_1=1;
 
-global A_62 : [0..2];
 global A_82 : [0..2];
 global A_72 : [0..2];
-global A_73 : [0..2];
-global A_7 : [0..2];
 global A_8 : [0..2];
-global A_24 : [0..2];
-global A_63 : [0..2];
 global A_6 : [0..2];
+global A_24 : [0..2];
+global A_73 : [0..2];
+global A_63 : [0..2];
+global A_7 : [0..2];
 global A_4 : [0..2];
+global A_62 : [0..2];
 global A_3 : [1..2];
 
 module attacker
 
+	a72 : bool;
+	a8 : bool;
+	a7 : bool;
+	a24 : bool;
+	a62 : bool;
+	a102 : bool;
 	a112 : bool;
 	a103 : bool;
-	a6 : bool;
-	a92 : bool;
 	a82 : bool;
-	a72 : bool;
-	a4 : bool;
-	a63 : bool;
 	a73 : bool;
-	a7 : bool;
 	a54 : bool;
-	a62 : bool;
+	a6 : bool;
+	a4 : bool;
+	a92 : bool;
 	a93 : bool;
-	a102 : bool;
-	a8 : bool;
-	a24 : bool;
+	a63 : bool;
 
 	[a4] sched=1 & !A_1=1 & A_1=0 & !a4 & (A_4=1) -> (A_1'=1) & (a4'=true) & (sched'=2);
 	[a6] sched=1 & !A_1=1 & A_4=0 & !a6 & (A_6=1) -> (A_4'=1) & (a6'=true) & (sched'=2);

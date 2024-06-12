@@ -1,0 +1,103 @@
+PRISM-games
+===========
+
+Version: 3.2.1 (based on PRISM 4.8.dev)
+Date: Wed Jun 12 00:00:46 CEST 2024
+Hostname: kathara-Virtual-Machine
+Memory limits: cudd=10g, java(heap)=480g
+Command line: prism-games -javamaxmem 480g -cuddmaxmem 10g experiments/experiment3/prism/root.prism experiments/experiment3/prism/properties.props -prop 1 -exportstrat results/root/root.dot
+
+Parsing model file "experiments/experiment3/prism/root.prism"...
+
+Type:        SMG
+Modules:     attacker defender
+Variables:   sched root A_62 A_82 A_72 A_73 A_7 A_8 A_24 A_1 A_6 A_63 A_4 A_2 A_3 a72 a4 a63 a54 a102 a112 a103 a92 a1 a73 a5 a62 a93 a6 a2 a82 a7 a8 a24
+
+Parsing properties file "experiments/experiment3/prism/properties.props"...
+
+1 property:
+(1) <<attacker,defender>>R{"attacker"}min=? [ F "terminate" ]+R{"defender"}min=? [ F "deadlock" ]
+
+---------------------------------------------------------------------
+
+Model checking: <<attacker,defender>>R{"attacker"}min=? [ F "terminate" ]+R{"defender"}min=? [ F "deadlock" ]
+
+Warning: Switching to explicit engine to allow strategy generation.
+
+Building model...
+
+Computing reachable states... 128441 280630 394363 507989 707373 903696 1050577 1189084 1304672 1397904 1496677 1601908 1747145 1964461 2177908 2414008 2612341 2755875 2901665 3014126 3191948 3344318 3448385 3553452 3669403 3789026 3919322 4085163 4356386 4604883 4899566 5156166 5286947 5498975 5642706 5791195 6024404 6144548 6300411 6463269 6622495 6784728 7109602 7440659 7698246 7953994 8222408 8429314 8694520 9090737 9409756 states
+Reachable states exploration and model construction done in 152.367 secs.
+Sorting reachable states list...
+
+Time for model construction: 173.817 seconds.
+
+Warning: Deadlocks detected and fixed in 1781764 states
+
+Type:        SMG
+States:      9409756 (1 initial)
+Transitions: 35823200
+Choices:     35823200
+Max/avg:     13/3.81
+Building reward structure...
+
+Starting expected reachability...
+Starting Prob1 (maxmin)...
+Prob1 (maxmin) took 22 iterations and 249.457 seconds.
+target=1429394, inf=3086077, rest=4894285
+Computing the upper bound where 5.0 is used instead of 0.0
+Starting value iteration (minmax)...
+Value iteration (minmax) took 21 iterations and 134.119 seconds.
+Computed an over-approximation of the solution (in 134 seconds), this will now be used to get the solution
+Starting value iteration (minmax)...
+Value iteration (minmax) took 11 iterations and 71.951 seconds.
+Expected reachability took 456.42 seconds.
+Building reward structure...
+
+Starting expected reachability...
+Starting Prob1 (maxmax)...
+Prob1 (maxmax) took 9 iterations and 116.79 seconds.
+target=1781764, inf=0, rest=7627992
+Computing the upper bound where 20.0 is used instead of 0.0
+Starting value iteration (minmin)...
+Value iteration (minmin) took 21 iterations and 194.373 seconds.
+Computed an over-approximation of the solution (in 194 seconds), this will now be used to get the solution
+Starting value iteration (minmin)...
+Value iteration (minmin) took 11 iterations and 101.992 seconds.
+Expected reachability took 414.789 seconds.
+
+Value in the initial state: 790.0
+
+Time for model checking: 886.395 seconds.
+
+Result: 790.0 (exact floating point)
+
+Exporting strategy as a dot file to file "results/root/root.dot"...
+
+---------------------------------------------------------------------
+
+Note: There were 2 warnings during computation.
+
+	Command being timed: "prism-games-3.2.1-linux64-x86/bin/prism -javamaxmem 480g -cuddmaxmem 10g experiments/experiment3/prism/root.prism experiments/experiment3/prism/properties.props -prop 1 -exportstrat results/root/root.dot"
+	User time (seconds): 2093.37
+	System time (seconds): 39.29
+	Percent of CPU this job got: 198%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 17:56.02
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 72690168
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 0
+	Minor (reclaiming a frame) page faults: 1407462
+	Voluntary context switches: 204847
+	Involuntary context switches: 10637
+	Swaps: 0
+	File system inputs: 0
+	File system outputs: 1160
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 0

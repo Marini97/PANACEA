@@ -14,18 +14,18 @@ global sched : [1..2];
 global A_6 : [0..1];
 label "terminate" = A_6=1;
 
-global A_82 : [0..2];
 global A_62 : [0..2];
+global A_82 : [0..2];
 global A_72 : [0..2];
 
 module attacker
 
-	progressa112 : bool;
-	progressa92 : bool;
-	progressa82 : bool;
 	progressa72 : bool;
 	progressa62 : bool;
+	progressa92 : bool;
+	progressa82 : bool;
 	progressa102 : bool;
+	progressa112 : bool;
 
 	time1 : [-1..3];
 	[wait1] sched=1 & time1>0 -> (sched'=2) & (time1'=time1-1);
@@ -59,9 +59,9 @@ endmodule
 module defender
 
 
-	progressc72 : bool;
-	progressc62 : bool;
 	progressc82 : bool;
+	progressc62 : bool;
+	progressc72 : bool;
 
 	time2 : [-1..2];
 	[wait2] sched=2 & time2>0 -> (sched'=1) & (time2'=time2-1);
@@ -90,9 +90,9 @@ endrewards
 
 rewards "defender"
 
+	[enda82] true : 100;
 	[enda62] true : 1000;
 	[enda72] true : 300;
-	[enda82] true : 100;
 	[startc62] true : 30;
 	[startc72] true : 40;
 	[startc82] true : 20;

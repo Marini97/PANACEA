@@ -14,33 +14,33 @@ global sched : [1..2];
 global A_4 : [0..1];
 label "terminate" = A_4=1;
 
-global A_62 : [0..2];
-global A_82 : [0..2];
-global A_72 : [0..2];
-global A_73 : [0..2];
-global A_7 : [0..2];
 global A_8 : [0..2];
 global A_24 : [0..2];
-global A_63 : [0..2];
 global A_6 : [0..2];
+global A_72 : [0..2];
+global A_7 : [0..2];
+global A_62 : [0..2];
+global A_73 : [0..2];
+global A_82 : [0..2];
+global A_63 : [0..2];
 
 module attacker
 
-	progressa112 : bool;
-	progressa103 : bool;
 	progressa6 : bool;
-	progressa92 : bool;
-	progressa82 : bool;
-	progressa72 : bool;
-	progressa63 : bool;
-	progressa73 : bool;
-	progressa54 : bool;
-	progressa7 : bool;
 	progressa62 : bool;
-	progressa93 : bool;
+	progressa72 : bool;
+	progressa54 : bool;
 	progressa102 : bool;
+	progressa103 : bool;
+	progressa92 : bool;
 	progressa8 : bool;
+	progressa73 : bool;
+	progressa93 : bool;
+	progressa7 : bool;
+	progressa112 : bool;
+	progressa82 : bool;
 	progressa24 : bool;
+	progressa63 : bool;
 
 	time1 : [-1..3];
 	[wait1] sched=1 & time1>0 -> (sched'=2) & (time1'=time1-1);
@@ -110,14 +110,14 @@ endmodule
 module defender
 
 
-	progressc8 : bool;
-	progressc62 : bool;
-	progressc63 : bool;
 	progressc6 : bool;
 	progressc82 : bool;
-	progressc73 : bool;
-	progressc7 : bool;
+	progressc62 : bool;
 	progressc24 : bool;
+	progressc8 : bool;
+	progressc7 : bool;
+	progressc73 : bool;
+	progressc63 : bool;
 	progressc72 : bool;
 
 	time2 : [-1..2];
@@ -174,8 +174,8 @@ endrewards
 
 rewards "defender"
 
-	[enda6] true : 1000;
 	[enda8] true : 100;
+	[enda6] true : 1000;
 	[enda7] true : 300;
 	[startc6] true : 30;
 	[startc7] true : 40;

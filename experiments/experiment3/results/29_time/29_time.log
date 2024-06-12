@@ -1,0 +1,103 @@
+PRISM-games
+===========
+
+Version: 3.2.1 (based on PRISM 4.8.dev)
+Date: Tue Jun 11 23:23:47 CEST 2024
+Hostname: kathara-Virtual-Machine
+Memory limits: cudd=10g, java(heap)=480g
+Command line: prism-games -javamaxmem 480g -cuddmaxmem 10g experiments/experiment3/prism/A_1_time.prism experiments/experiment3/prism/properties.props -prop 1 -exportstrat results/A_1_time/A_1_time.dot
+
+Parsing model file "experiments/experiment3/prism/A_1_time.prism"...
+
+Type:        SMG
+Modules:     attacker defender
+Variables:   sched A_1 A_62 A_82 A_72 A_73 A_7 A_8 A_24 A_63 A_6 A_4 A_3 progressa112 progressa103 progressa6 progressa92 progressa82 progressa72 progressa4 progressa63 progressa73 progressa7 progressa54 progressa62 progressa93 progressa102 progressa8 progressa24 time1 progressc3 progressc8 progressc62 progressc63 progressc6 progressc82 progressc4 progressc73 progressc7 progressc24 progressc72 time2
+
+Parsing properties file "experiments/experiment3/prism/properties.props"...
+
+1 property:
+(1) <<attacker,defender>>R{"attacker"}min=? [ F "terminate" ]+R{"defender"}min=? [ F "deadlock" ]
+
+---------------------------------------------------------------------
+
+Model checking: <<attacker,defender>>R{"attacker"}min=? [ F "terminate" ]+R{"defender"}min=? [ F "deadlock" ]
+
+Warning: Switching to explicit engine to allow strategy generation.
+
+Building model...
+
+Computing reachable states... 256429 533668 791663 1080312 1363462 1659103 1955730 2243449 2531040 2801712 3098728 3382132 3613978 3870479 4163681 4460571 4761461 5050222 5350741 5657563 5957757 6270833 6570630 6839437 7127963 7409895 7706025 7954269 8227552 8491408 8790558 9071092 9376612 9639420 9889338 10138557 10421472 10726107 10994459 11270098 11545175 11824228 12103241 12365948 12653461 12950473 13207099 13491795 13762100 14044482 14336869 14602542 14870860 15141653 15445661 15726124 15988622 16279990 16548959 16837656 17123841 17406877 17677627 17948118 18175161 18450703 18736144 19025054 19295643 19495266 states
+Reachable states exploration and model construction done in 209.22 secs.
+Sorting reachable states list...
+
+Time for model construction: 233.203 seconds.
+
+Warning: Deadlocks detected and fixed in 181013 states
+
+Type:        SMG
+States:      19495266 (1 initial)
+Transitions: 24667369
+Choices:     24667369
+Max/avg:     11/1.27
+Building reward structure...
+
+Starting expected reachability...
+Starting Prob1 (maxmin)...
+Prob1 (maxmin) took 86 iterations and 590.248 seconds.
+target=162476, inf=10374189, rest=8958601
+Computing the upper bound where 5.0 is used instead of 0.0
+Starting value iteration (minmax)...
+Value iteration (minmax) took 49 iterations and 173.296 seconds.
+Computed an over-approximation of the solution (in 173 seconds), this will now be used to get the solution
+Starting value iteration (minmax)...
+Value iteration (minmax) took 43 iterations and 149.003 seconds.
+Expected reachability took 913.887 seconds.
+Building reward structure...
+
+Starting expected reachability...
+Starting Prob1 (maxmax)...
+Prob1 (maxmax) took 33 iterations and 263.028 seconds.
+target=181013, inf=0, rest=19314253
+Computing the upper bound where 5.0 is used instead of 0.0
+Starting value iteration (minmin)...
+Value iteration (minmin) took 39 iterations and 259.114 seconds.
+Computed an over-approximation of the solution (in 259 seconds), this will now be used to get the solution
+Starting value iteration (minmin)...
+Value iteration (minmin) took 38 iterations and 240.751 seconds.
+Expected reachability took 764.129 seconds.
+
+Value in the initial state: 280.0
+
+Time for model checking: 1695.975 seconds.
+
+Result: 280.0 (exact floating point)
+
+Exporting strategy as a dot file to file "results/A_1_time/A_1_time.dot"...
+
+---------------------------------------------------------------------
+
+Note: There were 2 warnings during computation.
+
+	Command being timed: "prism-games-3.2.1-linux64-x86/bin/prism -javamaxmem 480g -cuddmaxmem 10g experiments/experiment3/prism/A_1_time.prism experiments/experiment3/prism/properties.props -prop 1 -exportstrat results/A_1_time/A_1_time.dot"
+	User time (seconds): 3619.45
+	System time (seconds): 55.46
+	Percent of CPU this job got: 190%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 32:10.98
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 117037468
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 0
+	Minor (reclaiming a frame) page faults: 1508518
+	Voluntary context switches: 281864
+	Involuntary context switches: 16079
+	Swaps: 0
+	File system inputs: 0
+	File system outputs: 2448
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 0

@@ -14,33 +14,33 @@ global sched : [1..2];
 global A_4 : [0..1];
 label "terminate" = A_4=1;
 
+global A_6 : [0..2];
+global A_7 : [0..2];
 global A_62 : [0..2];
-global A_82 : [0..2];
+global A_24 : [0..2];
 global A_72 : [0..2];
 global A_73 : [0..2];
-global A_7 : [0..2];
-global A_8 : [0..2];
-global A_24 : [0..2];
+global A_82 : [0..2];
 global A_63 : [0..2];
-global A_6 : [0..2];
+global A_8 : [0..2];
 
 module attacker
 
-	a112 : bool;
-	a103 : bool;
-	a6 : bool;
-	a92 : bool;
-	a82 : bool;
-	a72 : bool;
-	a63 : bool;
-	a73 : bool;
 	a54 : bool;
+	a82 : bool;
+	a112 : bool;
 	a7 : bool;
 	a62 : bool;
-	a93 : bool;
+	a92 : bool;
+	a6 : bool;
+	a103 : bool;
+	a72 : bool;
+	a73 : bool;
+	a63 : bool;
 	a102 : bool;
-	a8 : bool;
 	a24 : bool;
+	a8 : bool;
+	a93 : bool;
 
 	[a6] sched=1 & !A_4=1 & A_4=0 & !a6 & (A_6=1) -> (A_4'=1) & (a6'=true) & (sched'=2);
 	[a7] sched=1 & !A_4=1 & A_4=0 & !a7 & (A_7=1) -> (A_4'=1) & (a7'=true) & (sched'=2);
@@ -97,8 +97,8 @@ endrewards
 
 rewards "defender"
 
-	[a6] true : 1000;
 	[a8] true : 100;
+	[a6] true : 1000;
 	[a7] true : 300;
 	[c6] true : 30;
 	[c7] true : 40;
