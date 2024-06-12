@@ -20,7 +20,9 @@ def main():
     file = args.output
     tp.save_prism_model(prism_model, file)
     if args.props:
-        tp.save_prism_properties(file.replace('.prism', '.props'))
+        # save the properties file in the same directory as the output file
+        path_output = "/".join(file.split("/")[:-1])
+        tp.save_prism_properties(f"{path_output}properties.props")
 
     
 if __name__ == '__main__':

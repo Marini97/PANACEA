@@ -1,0 +1,25 @@
+DIRECTORY=experiments/experiment3
+PRISM_PATH=prism-games-3.2.1-linux64-x86
+JVM_MEMORY=$1
+CUDD_MEMORY=$2
+
+rm -rf "$DIRECTORY"/prism/
+rm -rf "$DIRECTORY"/results/
+mkdir "$DIRECTORY"/prism/
+mkdir "$DIRECTORY"/results/
+
+for TREE_FILE in "$DIRECTORY"/trees/*.xml; do
+    BASENAME=$(basename "$TREE_FILE" .xml)
+    
+    python3 main.py -i "$TREE_FILE" -o "$DIRECTORY"/prism/"$BASENAME".prism --props
+    python3 main.py -i "$TREE_FILE" -o "$DIRECTORY"/prism/"$BASENAME"_time.prism -t
+done
+
+# Loop over each .prism file in the directory
+for MODEL_FILE in "$DIRECTORY"/prism/*.prism; do
+  # Extract the base name of the file (without the directory and extension)
+  BASENAME=$(basename "$MODEL_FILE" .prism)
+
+  # Run the command with /usr/bin/time and redirect the output to the respective file
+  /usr/bin/time -v "$PRISM_PATH"/bin/prism -javamaxmem "$JVM_MEMORY"g -cuddmaxmem "$CUDD_MEMORY"g "$MODEL_FILE" "$DIRECTORY"/prism/properties.props -prop 1 -exportstrat "$DIRECTORY"/results/"$BASENAME"/"$BASENAME".dot 2>&1 | tee "$DIRECTORY"/results/"$BASENAME"/"$BASENAME".txt
+done
