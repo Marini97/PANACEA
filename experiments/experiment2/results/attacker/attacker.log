@@ -2,35 +2,102 @@ PRISM-games
 ===========
 
 Version: 3.2.1 (based on PRISM 4.8.dev)
-Date: Wed Jun 12 15:48:21 CEST 2024
-Hostname: kathara-Virtual-Machine
-Memory limits: cudd=10g, java(heap)=480g
-Command line: prism-games -javamaxmem 480g -cuddmaxmem 10g experiments/experiment2/prism/attacker.prism experiments/experiment2/prism/properties.props -prop 1 -exportstrat experiments/experiment2/results/attacker/attacker.dot
+Date: Thu Jun 13 14:52:01 CEST 2024
+Hostname: pitagora
+Memory limits: cudd=5g, java(heap)=50g
+Command line: prism-games -javamaxmem 50g -cuddmaxmem 5g experiments/experiment2/prism/attacker.prism experiments/experiment2/prism/properties.props -prop 1 -exportstrat experiments/experiment2/results/attacker/attacker.dot
 
 Parsing model file "experiments/experiment2/prism/attacker.prism"...
 
-Error: Syntax error ("endplayer", line 9, column 1).
-Command exited with non-zero status 1
-	Command being timed: "/home/kathara/Desktop/atd-mdp-experiments/prism-games-3.2.1-linux64-x86/bin/prism -javamaxmem 480g -cuddmaxmem 10g experiments/experiment2/prism/attacker.prism experiments/experiment2/prism/properties.props -prop 1 -exportstrat experiments/experiment2/results/attacker/attacker.dot"
-	User time (seconds): 2.70
-	System time (seconds): 0.42
-	Percent of CPU this job got: 330%
-	Elapsed (wall clock) time (h:mm:ss or m:ss): 0:00.94
+Type:        SMG
+Modules:     attacker defender
+Variables:   sched root A_6 A_4 A_8 A_2 A_7 A_1 A_3 a1 a2 a4 a5 a6 a7 a8 a9 a10 a11
+
+Parsing properties file "experiments/experiment2/prism/properties.props"...
+
+1 property:
+(1) <<attacker,defender>>R{"attacker"}min=? [ F "terminate" ]+R{"defender"}min=? [ F "terminate" ]
+
+---------------------------------------------------------------------
+
+Model checking: <<attacker,defender>>R{"attacker"}min=? [ F "terminate" ]+R{"defender"}min=? [ F "terminate" ]
+
+Warning: Switching to explicit engine to allow strategy generation.
+
+Building model...
+
+Computing reachable states... 239 states
+Reachable states exploration and model construction done in 0.049 secs.
+Sorting reachable states list...
+
+Time for model construction: 0.086 seconds.
+
+Warning: Deadlocks detected and fixed in 56 states
+
+Type:        SMG
+States:      239 (1 initial)
+Transitions: 383
+Choices:     383
+Max/avg:     4/1.60
+Building reward structure...
+
+Starting expected reachability...
+Starting Prob1 (maxmin)...
+Prob1 (maxmin) took 5 iterations and 0.014 seconds.
+target=112, inf=0, rest=127
+Computing the upper bound where 5.0 is used instead of 0.0
+Starting value iteration (minmax)...
+Value iteration (minmax) took 11 iterations and 0.008 seconds.
+Computed an over-approximation of the solution (in 0 seconds), this will now be used to get the solution
+Starting value iteration (minmax)...
+Value iteration (minmax) took 9 iterations and 0.003 seconds.
+Expected reachability took 0.039 seconds.
+Building reward structure...
+
+Starting expected reachability...
+Starting Prob1 (maxmax)...
+Prob1 (maxmax) took 5 iterations and 0.002 seconds.
+target=112, inf=0, rest=127
+Computing the upper bound where 0.0 is used instead of 0.0
+Starting value iteration (minmin)...
+Value iteration (minmin) took 1 iterations and 0.001 seconds.
+Computed an over-approximation of the solution (in 0 seconds), this will now be used to get the solution
+Starting value iteration (minmin)...
+Value iteration (minmin) took 1 iterations and 0.0 seconds.
+Expected reachability took 0.003 seconds.
+
+Value in the initial state: 120.0
+
+Time for model checking: 0.064 seconds.
+
+Result: 120.0 (exact floating point)
+
+Exporting strategy as a dot file to file "experiments/experiment2/results/attacker/attacker.dot"...
+
+---------------------------------------------------------------------
+
+Note: There were 2 warnings during computation.
+
+	Command being timed: "../prism-games-3.2.1-linux64-x86/bin/prism -javamaxmem 50g -cuddmaxmem 5g experiments/experiment2/prism/attacker.prism experiments/experiment2/prism/properties.props -prop 1 -exportstrat experiments/experiment2/results/attacker/attacker.dot"
+	User time (seconds): 3.88
+	System time (seconds): 0.33
+	Percent of CPU this job got: 246%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 0:01.70
 	Average shared text size (kbytes): 0
 	Average unshared data size (kbytes): 0
 	Average stack size (kbytes): 0
 	Average total size (kbytes): 0
-	Maximum resident set size (kbytes): 349144
+	Maximum resident set size (kbytes): 246136
 	Average resident set size (kbytes): 0
 	Major (requiring I/O) page faults: 0
-	Minor (reclaiming a frame) page faults: 18652
-	Voluntary context switches: 5187
-	Involuntary context switches: 290
+	Minor (reclaiming a frame) page faults: 69926
+	Voluntary context switches: 7128
+	Involuntary context switches: 463
 	Swaps: 0
 	File system inputs: 0
-	File system outputs: 64
+	File system outputs: 72
 	Socket messages sent: 0
 	Socket messages received: 0
 	Signals delivered: 0
 	Page size (bytes): 4096
-	Exit status: 1
+	Exit status: 0

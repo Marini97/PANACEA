@@ -6,6 +6,7 @@ player attacker
 endplayer
 player defender
 	defender,
+	[skip]
 endplayer
 
 global sched : [1..2];
@@ -13,30 +14,30 @@ global sched : [1..2];
 global root : [0..1];
 label "terminate" = root=1;
 
-global A_2 : [0..2];
 global A_6 : [0..2];
-global A_1 : [0..2];
 global A_4 : [0..2];
-global A_7 : [0..2];
 global A_8 : [0..2];
+global A_2 : [0..2];
+global A_7 : [0..2];
+global A_1 : [0..2];
 global A_3 : [1..2];
 
 module attacker
 
-	a10 : bool;
-	a6 : bool;
-	a5 : bool;
-	a11 : bool;
-	a9 : bool;
-	a2 : bool;
-	a8 : bool;
-	a7 : bool;
 	a1 : bool;
+	a2 : bool;
 	a4 : bool;
+	a5 : bool;
+	a6 : bool;
+	a7 : bool;
+	a8 : bool;
+	a9 : bool;
+	a10 : bool;
+	a11 : bool;
 
 	[a1] sched=1 & !root=1 & root=0 & !a1 & (A_1=1) -> (root'=1) & (a1'=true) & (sched'=2);
 	[a2] sched=1 & !root=1 & root=0 & !a2 & (A_2=1) -> (root'=1) & (a2'=true) & (sched'=2);
-	[a4] sched=1 & !root=1 & A_1=0 & !a4 & (A_3=1 & A_4=1) -> (A_1'=1) & (a4'=true) & (sched'=2);
+	[a4] sched=1 & !root=1 & A_1=0 & !a4 & (A_4=1 & A_3=1) -> (A_1'=1) & (a4'=true) & (sched'=2);
 	[a5] sched=1 & !root=1 & A_2=0 & !a5 -> (A_2'=1) & (a5'=true) & (sched'=2);
 	[a6] sched=1 & !root=1 & A_4=0 & !a6 & (A_6=1) -> (A_4'=1) & (a6'=true) & (sched'=2);
 	[a7] sched=1 & !root=1 & A_4=0 & !a7 & (A_7=1) -> (A_4'=1) & (a7'=true) & (sched'=2);
@@ -49,7 +50,7 @@ endmodule
 
 module defender
 
-
+	[skip] sched=2 -> (sched'=1);
 
 endmodule
 
@@ -70,7 +71,5 @@ endrewards
 
 rewards "defender"
 
-	[a1] true : 500;
-	[a2] true : 5000;
 
 endrewards
