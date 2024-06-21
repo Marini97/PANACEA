@@ -47,7 +47,7 @@ def plot_time_size_figure(result_path):
     plt.legend(loc='upper center', bbox_to_anchor=(0.5, 1.2), labelspacing=0.2, ncols=3, prop={'size': 6})
 
     plt.savefig(
-        os.path.join(figures_path, f"time_size_figure.pdf"), format="pdf", bbox_inches='tight'
+        os.path.join(figures3_path, f"time_size_figure.pdf"), format="pdf", bbox_inches='tight'
     )
 
 
@@ -79,7 +79,7 @@ def plot_mdp_size_tree_size_figure(result_path):
     plt.legend(loc='upper center', bbox_to_anchor=(0.5, 1.2), labelspacing=0.2, ncols=3, prop={'size': 6})
 
     plt.savefig(
-        os.path.join(figures_path, f"mdp_adt_size_figure.pdf"), format="pdf", bbox_inches='tight'
+        os.path.join(figures3_path, f"mdp_adt_size_figure.pdf"), format="pdf", bbox_inches='tight'
     )
 
 
@@ -110,7 +110,7 @@ def plot_mdp_size_time_figure(result_path):
     # plt.legend(loc='upper center', bbox_to_anchor=(0.5, 1.2), labelspacing=0.2, ncols=3, prop={'size': 6})
 
     plt.savefig(
-        os.path.join(figures_path, f"mdp_size_time_figure.pdf"), format="pdf", bbox_inches='tight'
+        os.path.join(figures3_path, f"mdp_size_time_figure.pdf"), format="pdf", bbox_inches='tight'
     )
 
 
@@ -155,7 +155,7 @@ def plot_reward_figure(result_path):
     def compute_rewards(experiment_name):
         experiment_path = os.path.join(result_path, experiment_name)
         dot_path = os.path.join(experiment_path, f"{experiment_name}.dot")
-        prism_path = os.path.join(experiments_prism_path, f"{experiment_name}.prism")
+        prism_path = os.path.join(experiment3_prism_path, f"{experiment_name}.prism")
         actions = parse_dot_file(dot_path)
         attacker_rewards = get_actions_rewards(prism_path, "attacker")
         defender_rewards = get_actions_rewards(prism_path, "defender")
@@ -204,20 +204,134 @@ def plot_reward_figure(result_path):
     plt.legend(loc='upper center', bbox_to_anchor=(0.5, 1.2), labelspacing=0.2, ncols=2, prop={'size': 6})
 
     plt.savefig(
-        os.path.join(figures_path, f"reward_figure.pdf"), format="pdf", bbox_inches='tight'
+        os.path.join(figures3_path, f"reward_figure.pdf"), format="pdf", bbox_inches='tight'
     )
 
 
+def plot_reward_single_multi(result_path):
+    """
+    histogram with rewards from experiment1 (gamma0, gamma1) and experiment2 (attacker, defender)
+    """
+    def parse_dot_file(file_path):
+        results = []
+        with open(file_path, "r") as dot_file:
+            lines = dot_file.readlines()
+        for line in lines:
+            if ":" not in line:
+                continue
+            results.append(line.split(":")[-1].split("\"")[0])
+        return results
+    
+    def parse_csv_file(file_path):
+        results = []
+        with open(file_path, "r") as csv_file:
+            lines = csv_file.readlines()
+        for line in lines:
+            # [action]
+            if "[" not in line:
+                continue
+            results.append(line.split("[")[1].split("]")[0])
+        return results
+    
+    def parse_defender_file(file_path):
+        # get last element of each row if it's an integer
+        parsed_result = [ int(row[-1]) for row in csv.reader(open(file_path), delimiter=",") if row and row[-1].isdigit()]
+        reward = sum(parsed_result) / len(parsed_result)
+        return reward
+
+    def get_actions_rewards(prism_path, agent):
+        results = {}
+        reward_pattern = re.compile(rf'rewards "{agent}"(.*?)endrewards', re.DOTALL)
+        with open(prism_path, "r") as prism_file:
+            lines = prism_file.read()
+        match = reward_pattern.search(lines)
+
+        actions_rewards = match.group(1).strip().split(";")
+        for line in actions_rewards:
+            match = re.search(r'\[(.*?)\].*:\s*(\d+)', line)
+            if match:
+                action = match.group(1)
+                cost = match.group(2)
+                results[action] = int(cost)
+        return results
+
+    def compute_reward(actions, actions_rewards):
+        reward = 0
+        for action in actions:
+            if action in actions_rewards:
+                reward += int(actions_rewards[action])
+        return reward
+
+    def compute_rewards(experiment_name):
+        experiment_path = os.path.join(result_path, experiment_name)
+        if "defender" in experiment_name:
+            defender_reward = parse_defender_file(os.path.join(experiment_path, f"{experiment_name}.csv"))
+            return 0, defender_reward
+        if os.path.exists(os.path.join(experiment_path, f"{experiment_name}.dot")):
+            dot_path = os.path.join(experiment_path, f"{experiment_name}.dot")
+            actions = parse_dot_file(dot_path)
+        elif os.path.exists(os.path.join(experiment_path, f"{experiment_name}.csv")):
+            csv_file = os.path.join(experiment_path, f"{experiment_name}.csv")
+            actions = parse_csv_file(csv_file)
+            
+        prism_path = os.path.join(experiment2_prism_path, f"{experiment_name}.prism")
+        attacker_rewards = get_actions_rewards(prism_path, "attacker")
+        defender_rewards = get_actions_rewards(prism_path, "defender")
+        attacker_reward = compute_reward(actions, attacker_rewards)
+        defender_reward = compute_reward(actions, defender_rewards)
+        return attacker_reward, defender_reward
+    
+    plt.clf()
+    plt.grid(linestyle='--', linewidth=0.5)
+
+    to_plot = {'x': []}
+    rewards = {'Att': [], 'Def': []}
+    offset = 5
+    for experiment_name in sorted(os.listdir(result_path)):
+        ar, dr = compute_rewards(experiment_name)
+        to_plot['x'].append(experiment_name)
+        rewards['Att'].append(ar)
+        rewards['Def'].append(dr)
+        offset += 5
+        
+    x_values = [x for x in range(0, len(to_plot['x'])*10, 10)]
+    
+    plt.bar(x_values, np.array(rewards['Att']), label="Att", fill=None,
+            hatch="////", edgecolor="blue", width=4)
+    plt.bar(x_values, np.array(rewards['Def']), label="Def",
+            bottom=np.array(rewards['Att']), fill=None, hatch="////", edgecolor="green", width=4)
+    
+    plt.xticks(x_values, to_plot['x'], fontsize=7)
+    plt.yticks(range(0, 7000, 1000))
+    
+    plt.xlabel('Experiment')
+    plt.ylabel('Cost')
+    plt.legend(loc='upper center', bbox_to_anchor=(0.5, 1.2), labelspacing=0.2, ncols=2, prop={'size': 6})
+
+    plt.savefig(
+        os.path.join(figures2_path, f"reward_solo_multi_figure.pdf"), format="pdf", bbox_inches='tight'
+    )
+    
+    
+    
 if __name__ == '__main__':
     plt.figure(figsize=(4, 2))
-    experiments_path = os.path.join("experiments", "experiment3")
-    experiments_prism_path = os.path.join(experiments_path, "prism")
-    experiments_results_path = os.path.join(experiments_path, "results")
+    experiment3_path = os.path.join("experiments", "experiment3")
+    experiment3_prism_path = os.path.join(experiment3_path, "prism")
+    experiment3_results_path = os.path.join(experiment3_path, "results")
 
-    figures_path = os.path.join(experiments_path, "figures")
-
-    os.makedirs(figures_path, exist_ok=True)
-    plot_reward_figure(experiments_results_path)
-    plot_time_size_figure(os.path.join(experiments_path, "result.csv"))
-    plot_mdp_size_tree_size_figure(os.path.join(experiments_path, "result.csv"))
-    plot_mdp_size_time_figure(os.path.join(experiments_path, "result.csv"))
+    experiment2_path = os.path.join("experiments", "experiment2")
+    experiment2_prism_path = os.path.join(experiment2_path, "prism")
+    experiment2_results_path = os.path.join(experiment2_path, "results")
+    
+    figures3_path = os.path.join(experiment3_path, "figures")
+    figures2_path = os.path.join(experiment2_path, "figures")
+    
+    os.makedirs(figures3_path, exist_ok=True)
+    os.makedirs(figures2_path, exist_ok=True)
+    plot_reward_figure(experiment3_results_path)
+    plot_reward_single_multi(experiment2_results_path)
+    plot_time_size_figure(os.path.join(experiment3_path, "result.csv"))
+    plot_mdp_size_tree_size_figure(os.path.join(experiment3_path, "result.csv"))
+    plot_mdp_size_time_figure(os.path.join(experiment3_path, "result.csv"))
+    

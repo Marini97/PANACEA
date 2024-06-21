@@ -6,26 +6,38 @@ player attacker
 endplayer
 player defender
 	defender,
-	[c1], [c2], [c3], [c4], [c6], [c7], [c8]
+	[c1], [c2], [c3], [c4], [c6], [c7], [c8], [c62], [c72], [c82], [c63], [c73], [c24]
 endplayer
 
 global sched : [1..2];
 
 global root : [0..1];
-label "terminate" = A_6!=1 & A_4!=1 & A_8!=1 & A_2!=1 & A_7!=1 & A_1!=1;
+label "terminate" = A_72!=1 & A_73!=1 & A_4!=1 & A_24!=1 & A_8!=1 & A_63!=1 & A_1!=1 & A_82!=1 & A_6!=1 & A_7!=1 & A_62!=1 & A_2!=1;
 
-const a6;
+const a72;
+const a73;
 const a4;
+const a24;
 const a8;
-const a2;
-const a7;
+const a63;
 const a1;
-global A_6 : [0..2];
+const a82;
+const a6;
+const a7;
+const a62;
+const a2;
+global A_72 : [0..2];
+global A_73 : [0..2];
 global A_4 : [0..2];
+global A_24 : [0..2];
 global A_8 : [0..2];
-global A_2 : [0..2];
-global A_7 : [0..2];
+global A_63 : [0..2];
 global A_1 : [0..2];
+global A_82 : [0..2];
+global A_6 : [0..2];
+global A_7 : [0..2];
+global A_62 : [0..2];
+global A_2 : [0..2];
 global A_3 : [1..2];
 
 module attacker
@@ -44,6 +56,12 @@ module defender
 	[c6] sched=2 & !root=1 & !A_6=2 -> (A_6'=2) & (sched'=1);
 	[c7] sched=2 & !root=1 & !A_7=2 -> (A_7'=2) & (sched'=1);
 	[c8] sched=2 & !root=1 & !A_8=2 -> (A_8'=2) & (sched'=1);
+	[c62] sched=2 & !root=1 & !A_62=2 -> (A_62'=2) & (sched'=1);
+	[c72] sched=2 & !root=1 & !A_72=2 -> (A_72'=2) & (sched'=1);
+	[c82] sched=2 & !root=1 & !A_82=2 -> (A_82'=2) & (sched'=1);
+	[c63] sched=2 & !root=1 & !A_63=2 -> (A_63'=2) & (sched'=1);
+	[c73] sched=2 & !root=1 & !A_73=2 -> (A_73'=2) & (sched'=1);
+	[c24] sched=2 & !root=1 & !A_24=2 -> (A_24'=2) & (sched'=1);
 
 endmodule
 
@@ -61,8 +79,14 @@ rewards "defender"
 	[c6] true : 30;
 	[c7] true : 40;
 	[c8] true : 20;
+	[c62] true : 30;
+	[c72] true : 40;
+	[c82] true : 20;
+	[c63] true : 30;
+	[c73] true : 40;
+	[c24] true : 500;
 
 endrewards
 
-init sched=1 & root=0 & A_6=a6 & A_4=a4 & A_8=a8 & A_2=a2 & A_7=a7 & A_1=a1 & A_3=1 endinit
+init sched=1 & root=0 & A_72=a72 & A_73=a73 & A_4=a4 & A_24=a24 & A_8=a8 & A_63=a63 & A_1=a1 & A_82=a82 & A_6=a6 & A_7=a7 & A_62=a62 & A_2=a2 & A_3=1 endinit
 

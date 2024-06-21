@@ -1,0 +1,103 @@
+PRISM-games
+===========
+
+Version: 3.2.1 (based on PRISM 4.8.dev)
+Date: Wed Jun 19 12:41:01 CEST 2024
+Hostname: pitagora
+Memory limits: cudd=5g, java(heap)=50g
+Command line: prism-games -javamaxmem 50g -cuddmaxmem 5g experiments/experiment2/prism/gamma1.prism experiments/experiment2/prism/properties.props -prop 1 -exportstrat experiments/experiment2/results/gamma1/gamma1.dot
+
+Parsing model file "experiments/experiment2/prism/gamma1.prism"...
+
+Type:        SMG
+Modules:     attacker defender
+Variables:   sched root A_72 A_73 A_4 A_24 A_8 A_63 A_1 A_82 A_6 A_7 A_62 A_2 A_3 a102 a73 a2 a1 a8 a6 a112 a62 a5 a82 a103 a63 a7 a92 a4 a24 a72 a93 a54
+
+Parsing properties file "experiments/experiment2/prism/properties.props"...
+
+1 property:
+(1) <<attacker,defender>>R{"attacker"}min=? [ F "terminate" ]+R{"defender"}min=? [ F "deadlock" ]
+
+---------------------------------------------------------------------
+
+Model checking: <<attacker,defender>>R{"attacker"}min=? [ F "terminate" ]+R{"defender"}min=? [ F "deadlock" ]
+
+Warning: Switching to explicit engine to allow strategy generation.
+
+Building model...
+
+Computing reachable states... 78865 201090 290804 360491 428391 529908 666481 794730 907276 1006794 1086831 1197635 1281767 1353175 1425234 1497076 1572133 1647914 1781433 1925204 2036494 2211937 2340495 2486086 2605495 2688146 2803966 2902668 2982463 3091392 3222975 3314727 3385770 3467505 3540090 3617706 3693862 3776885 3857704 3943490 4050802 4190055 4369884 4518977 4714594 4884820 5037003 5198321 5292511 5440675 5562234 5653132 5747587 5916361 6055334 6133603 6222601 6313101 6419417 6508731 6608174 6699765 6861694 7062370 7263509 7479912 7674849 7835044 7956098 8119167 8278563 8414704 8555478 8805727 9038410 9236480 9409756 states
+Reachable states exploration and model construction done in 229.745 secs.
+Sorting reachable states list...
+
+Time for model construction: 261.678 seconds.
+
+Warning: Deadlocks detected and fixed in 1781764 states
+
+Type:        SMG
+States:      9409756 (1 initial)
+Transitions: 35823200
+Choices:     35823200
+Max/avg:     13/3.81
+Building reward structure...
+
+Starting expected reachability...
+Starting Prob1 (maxmin)...
+Prob1 (maxmin) took 22 iterations and 352.825 seconds.
+target=1429394, inf=3086077, rest=4894285
+Computing the upper bound where 5.0 is used instead of 0.0
+Starting value iteration (minmax)...
+Value iteration (minmax) took 21 iterations and 182.66 seconds.
+Computed an over-approximation of the solution (in 182 seconds), this will now be used to get the solution
+Starting value iteration (minmax)...
+Value iteration (minmax) took 11 iterations and 93.805 seconds.
+Expected reachability took 630.009 seconds.
+Building reward structure...
+
+Starting expected reachability...
+Starting Prob1 (maxmax)...
+Prob1 (maxmax) took 9 iterations and 155.772 seconds.
+target=1781764, inf=0, rest=7627992
+Computing the upper bound where 20.0 is used instead of 0.0
+Starting value iteration (minmin)...
+Value iteration (minmin) took 21 iterations and 271.23 seconds.
+Computed an over-approximation of the solution (in 271 seconds), this will now be used to get the solution
+Starting value iteration (minmin)...
+Value iteration (minmin) took 11 iterations and 138.593 seconds.
+Expected reachability took 567.617 seconds.
+
+Value in the initial state: 790.0
+
+Time for model checking: 1223.035 seconds.
+
+Result: 790.0 (exact floating point)
+
+Exporting strategy as a dot file to file "experiments/experiment2/results/gamma1/gamma1.dot"...
+
+---------------------------------------------------------------------
+
+Note: There were 2 warnings during computation.
+
+	Command being timed: "../prism-games-3.2.1-linux64-x86/bin/prism -javamaxmem 50g -cuddmaxmem 5g experiments/experiment2/prism/gamma1.prism experiments/experiment2/prism/properties.props -prop 1 -exportstrat experiments/experiment2/results/gamma1/gamma1.dot"
+	User time (seconds): 3166.08
+	System time (seconds): 98.05
+	Percent of CPU this job got: 219%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 24:49.04
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 43607720
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 0
+	Minor (reclaiming a frame) page faults: 33878679
+	Voluntary context switches: 488819
+	Involuntary context switches: 78179
+	Swaps: 0
+	File system inputs: 0
+	File system outputs: 1592
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 0
