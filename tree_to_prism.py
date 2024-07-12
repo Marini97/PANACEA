@@ -78,7 +78,7 @@ def get_info(df):
         tuple: A tuple containing the following elements:
             - goal (str): The goal extracted from the DataFrame.
             - actions_to_goal (set): A set of actions leading to the goal.
-            - list_initial (list): A list of initial labels.
+            - initial_attributes (list): A list of initial attributes of the system.
             - attacker_actions (dict): A dictionary of attacker actions with their properties.
             - defender_actions (dict): A dictionary of defender actions with their properties.
             - df_attacker (pandas.DataFrame): The filtered DataFrame for attacker actions.
@@ -93,8 +93,16 @@ def get_info(df):
 
     df_defender = df.loc[df["Role"] == "Defender"]
 
-    list_initial = df_attacker.loc[df_attacker["Action"] == ""]["Label"].to_list()
-    df_attacker = df_attacker.loc[df_attacker["Action"] != ""]
+    # initial system attributes
+    initial_attributes = df_attacker.loc[df_attacker["Action"] == ""]["Label"].to_list()
+    for row in df_attacker.loc[df_attacker["Action"] == ""]["Label"].to_list():
+        children = df.loc[df["Label"] == row]["Children"].values
+        children = [c for sets in children for c in sets]
+        for child in children:
+            if child in df_attacker["Label"].values and row in initial_attributes:
+                initial_attributes.remove(row)
+
+    df_attacker = df_attacker.loc[~df_attacker["Label"].isin(initial_attributes)]
 
     # df actions with preconditions, effect and costs
     attacker_actions = {}
@@ -110,14 +118,9 @@ def get_info(df):
         cost = row["Cost"]
         refinement = df.loc[df['Label'] == effect]["Refinement"].values[0]
         time = row["Time"]
+        preconditions = row["Children"]
         
-        if refinement == "conjunctive" and row["Type"] == "Attribute":
-            preconditions = df.loc[row["Parent"] == df["Label"]]["Children"].values[0]
-            preconditions = [p for p in preconditions if row["Role"]==df.loc[df["Label"] == p]["Role"].values[0]]
-        elif row["Type"] == "Attribute":
-            preconditions = [row["Label"]]
-        else:
-            preconditions = []
+        preconditions = [p for p in preconditions if row["Role"]==df.loc[df["Label"] == p]["Role"].values[0]]
 
         if row["Role"] == "Attacker" and action not in attacker_actions:
             preconditions = [p for p in preconditions if p not in df_defender["Label"].values]
@@ -137,7 +140,7 @@ def get_info(df):
                     "time" : time,
                     "refinement" : refinement}
                 
-    return goal, actions_to_goal, list_initial, attacker_actions, defender_actions, df_attacker, df_defender
+    return goal, actions_to_goal, initial_attributes, attacker_actions, defender_actions, df_attacker, df_defender
 
 def get_prism_model(tree):
     """
@@ -150,7 +153,7 @@ def get_prism_model(tree):
         A string representing the PRISM model.
     """
     df = tree.to_dataframe()
-    goal, actions_to_goal, list_initial, attacker_actions, defender_actions, df_attacker, df_defender = get_info(df)
+    goal, actions_to_goal, initial_attributes, attacker_actions, defender_actions, df_attacker, df_defender = get_info(df)
     text = "smg\n\nplayer attacker\n\tattacker,\n\t"
 
     for a in attacker_actions.keys():
@@ -170,12 +173,12 @@ def get_prism_model(tree):
     for a in set(df_attacker.loc[df_attacker["Type"] == "Attribute"]["Label"].values):
         text += "global " + a + " : [0..2];\n"
         
-    for a in set(list_initial):
+    for a in set(initial_attributes):
         text += "global " + a + " : [1..2];\n"
 
     text += "\nmodule attacker\n\n"
-
-    for a in set(df_attacker["Action"].values):
+    
+    for a in attacker_actions.keys():
         text += f"\t{a} : bool;\n"
         
     text += "\n"

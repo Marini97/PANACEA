@@ -1,0 +1,185 @@
+<?xml version='1.0'?>
+<adtree>
+	<node refinement="disjunctive">
+		<label>Data Exfiltration</label>
+		<comment>Type: Goal
+Role: Attacker</comment>
+		<node refinement="disjunctive">
+			<label>exfiltrateData</label>
+			<comment>Type: Action
+Action: exfiltrateData
+Cost: 50
+Time: 2
+Role: Attacker</comment>
+			<node refinement="conjunctive">
+				<label>Access to MySQL</label>
+				<comment>Type: Attribute
+Role: Attacker</comment>
+				<node refinement="conjunctive">
+					<label>getLoginData</label>
+					<comment>Type: Action
+Action: getLoginData
+Cost: 10
+Time: 2
+Role: Attacker</comment>
+					<node refinement="conjunctive">
+						<label>Access to Sensitive Files</label>
+						<comment>Type: Attribute
+Role: Attacker</comment>
+						<node refinement="conjunctive">
+							<label>getFiles</label>
+							<comment>Type: Action
+Action: getFiles
+Cost: 30
+Time: 2
+Role: Attacker</comment>
+							<node refinement="conjunctive">
+								<label>Misconfigured Apache</label>
+								<comment>Type: Attribute
+Role: Attacker</comment>
+								<node refinement="conjunctive" switchRole="yes">
+									<label>Reconfigure Apache</label>
+									<comment>Type: Action
+Action: reconfigureApache
+Cost: 50
+Time: 2
+Role: Defender</comment>
+								</node>
+							</node>
+							<node refinement="conjunctive">
+								<label>Access to Reverse Shell</label>
+								<comment>Type: Attribute
+Role: Attacker</comment>
+								<node refinement="conjunctive">
+									<label>pathTraversal</label>
+									<comment>Type: Action
+Action: pathTraversal
+Cost: 20
+Time: 2
+Role: Attacker</comment>
+									<node refinement="disjunctive">
+										<label>Web Recon Succesful</label>
+										<comment>Type: Attribute
+Role: Attacker</comment>
+										<node refinement="disjunctive">
+											<label>webRecon</label>
+											<comment>Type: Action
+Action: webRecon
+Cost: 5
+Time: 1
+Role: Attacker</comment>
+											<node refinement="disjunctive">
+												<label>Webserver Publicly Exposed</label>
+												<comment>Type: Attribute
+Role: Attacker</comment>
+											</node>
+										</node>
+									</node>
+									<node refinement="conjunctive">
+										<label>CGI scripts enabled</label>
+										<comment>Type: Attribute
+Role: Attacker</comment>
+										<node refinement="conjunctive" switchRole="yes">
+											<label>Disable CGI Scripts</label>
+											<comment>Type: Action
+Action: disableCGIScripts
+Cost: 45
+Time: 1
+Role: Defender</comment>
+										</node>
+									</node>
+									<node refinement="conjunctive">
+										<label>Vulnerable Apache HTTP Server Version</label>
+										<comment>Type: Attribute
+Role: Attacker</comment>
+										<node refinement="conjunctive" switchRole="yes">
+											<label>Update Apache</label>
+											<comment>Type: Action
+Action: updateApache
+Cost: 20
+Time: 20
+Role: Defender</comment>
+										</node>
+									</node>
+								</node>
+							</node>
+						</node>
+						<node refinement="conjunctive" switchRole="yes">
+							<label>Change Files Permissions</label>
+							<comment>Type: Action
+Action: changeFilePermissions
+Cost: 60
+Time: 2
+Role: Defender</comment>
+						</node>
+					</node>
+					<node refinement="disjunctive">
+						<label>Unencrypted Files</label>
+						<comment>Type: Attribute
+Role: Attacker</comment>
+						<node refinement="disjunctive" switchRole="yes">
+							<label>Encrypt File</label>
+							<comment>Type: Action
+Action: encryptFile
+Cost: 150
+Time: 5
+Role: Defender</comment>
+						</node>
+					</node>
+				</node>
+				<node refinement="disjunctive" switchRole="yes">
+					<label>Change Credentials</label>
+					<comment>Type: Action
+Action: changeCredentials
+Cost: 200
+Time: 2
+Role: Defender</comment>
+				</node>
+			</node>
+			<node refinement="conjunctive">
+				<label>Access to Execute Arbitrary Code</label>
+				<comment>Type: Attribute
+Role: Attacker</comment>
+				<node refinement="conjunctive">
+					<label>bufferOverflow</label>
+					<comment>Type: Action
+Action: bufferOverflow
+Cost: 40
+Time: 2
+Role: Attacker</comment>
+					<node refinement="disjunctive">
+						<label>Web Recon Succesful</label>
+						<comment>Type: Attribute
+Role: Attacker</comment>
+						<node refinement="disjunctive">
+							<label>webRecon</label>
+							<comment>Type: Action
+Action: webRecon
+Cost: 5
+Time: 1
+Role: Attacker</comment>
+							<node refinement="disjunctive">
+								<label>Webserver Publicly Exposed</label>
+								<comment>Type: Attribute
+Role: Attacker</comment>
+							</node>
+						</node>
+					</node>
+					<node refinement="conjunctive">
+						<label>SOCKS5 Proxy Active</label>
+						<comment>Type: Attribute
+Role: Attacker</comment>
+						<node refinement="conjunctive" switchRole="yes">
+							<label>Deactivate SOCKS5 proxy</label>
+							<comment>Type: Action
+Action: deactivateSOCKS5Proxy
+Cost: 120
+Time: 1
+Role: Defender</comment>
+						</node>
+					</node>
+				</node>
+			</node>
+		</node>
+	</node>
+</adtree>

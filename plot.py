@@ -47,7 +47,7 @@ def plot_time_size_figure(result_path):
     plt.legend(loc='upper center', bbox_to_anchor=(0.5, 1.2), labelspacing=0.2, ncols=3, prop={'size': 6})
 
     plt.savefig(
-        os.path.join(figures3_path, f"time_size_figure.pdf"), format="pdf", bbox_inches='tight'
+        os.path.join(experiment3_figures_path, f"time_size_figure.pdf"), format="pdf", bbox_inches='tight'
     )
 
 
@@ -79,7 +79,7 @@ def plot_mdp_size_tree_size_figure(result_path):
     plt.legend(loc='upper center', bbox_to_anchor=(0.5, 1.2), labelspacing=0.2, ncols=3, prop={'size': 6})
 
     plt.savefig(
-        os.path.join(figures3_path, f"mdp_adt_size_figure.pdf"), format="pdf", bbox_inches='tight'
+        os.path.join(experiment3_figures_path, f"mdp_adt_size_figure.pdf"), format="pdf", bbox_inches='tight'
     )
 
 
@@ -110,7 +110,7 @@ def plot_mdp_size_time_figure(result_path):
     # plt.legend(loc='upper center', bbox_to_anchor=(0.5, 1.2), labelspacing=0.2, ncols=3, prop={'size': 6})
 
     plt.savefig(
-        os.path.join(figures3_path, f"mdp_size_time_figure.pdf"), format="pdf", bbox_inches='tight'
+        os.path.join(experiment3_figures_path, f"mdp_size_time_figure.pdf"), format="pdf", bbox_inches='tight'
     )
 
 
@@ -204,13 +204,13 @@ def plot_reward_figure(result_path):
     plt.legend(loc='upper center', bbox_to_anchor=(0.5, 1.2), labelspacing=0.2, ncols=2, prop={'size': 6})
 
     plt.savefig(
-        os.path.join(figures3_path, f"reward_figure.pdf"), format="pdf", bbox_inches='tight'
+        os.path.join(experiment3_figures_path, f"reward_figure.pdf"), format="pdf", bbox_inches='tight'
     )
 
 
-def plot_reward_single_multi(result_path):
+def plot_reward_single_multi(prism_path, result_path, figures_path):
     """
-    histogram with rewards from experiment1 (gamma0, gamma1) and experiment2 (attacker, defender)
+    histogram with rewards from experiment
     """
     def parse_dot_file(file_path):
         results = []
@@ -262,9 +262,9 @@ def plot_reward_single_multi(result_path):
                 reward += int(actions_rewards[action])
         return reward
 
-    def compute_rewards(experiment_name):
+    def compute_rewards(experiment_name, prism_path):
         experiment_path = os.path.join(result_path, experiment_name)
-        if "defender" in experiment_name:
+        if "efender" in experiment_name:
             defender_reward = parse_defender_file(os.path.join(experiment_path, f"{experiment_name}.csv"))
             return 0, defender_reward
         if os.path.exists(os.path.join(experiment_path, f"{experiment_name}.dot")):
@@ -274,7 +274,7 @@ def plot_reward_single_multi(result_path):
             csv_file = os.path.join(experiment_path, f"{experiment_name}.csv")
             actions = parse_csv_file(csv_file)
             
-        prism_path = os.path.join(experiment2_prism_path, f"{experiment_name}.prism")
+        prism_path = os.path.join(prism_path, f"{experiment_name}.prism")
         attacker_rewards = get_actions_rewards(prism_path, "attacker")
         defender_rewards = get_actions_rewards(prism_path, "defender")
         attacker_reward = compute_reward(actions, attacker_rewards)
@@ -287,9 +287,11 @@ def plot_reward_single_multi(result_path):
     to_plot = {'x': []}
     rewards = {'Att': [], 'Def': []}
     offset = 5
+    
     for experiment_name in sorted(os.listdir(result_path)):
-        ar, dr = compute_rewards(experiment_name)
-        to_plot['x'].append(experiment_name)
+        
+        ar, dr = compute_rewards(experiment_name, prism_path)
+        to_plot['x'].append(experiment_name.replace("_", " ")[:10])
         rewards['Att'].append(ar)
         rewards['Def'].append(dr)
         offset += 5
@@ -302,35 +304,43 @@ def plot_reward_single_multi(result_path):
             bottom=np.array(rewards['Att']), fill=None, hatch="////", edgecolor="green", width=4)
     
     plt.xticks(x_values, to_plot['x'], fontsize=7)
-    plt.yticks(range(0, 7000, 1000))
+    #plt.yticks(range(0, 7000, 1000))
     
     plt.xlabel('Experiment')
     plt.ylabel('Cost')
     plt.legend(loc='upper center', bbox_to_anchor=(0.5, 1.2), labelspacing=0.2, ncols=2, prop={'size': 6})
 
     plt.savefig(
-        os.path.join(figures2_path, f"reward_solo_multi_figure.pdf"), format="pdf", bbox_inches='tight'
+        os.path.join(figures_path, f"reward_solo_multi_figure.pdf"), format="pdf", bbox_inches='tight'
     )
     
     
     
 if __name__ == '__main__':
     plt.figure(figsize=(4, 2))
-    experiment3_path = os.path.join("experiments", "experiment3")
-    experiment3_prism_path = os.path.join(experiment3_path, "prism")
-    experiment3_results_path = os.path.join(experiment3_path, "results")
-
+    
+    experiment1_path = os.path.join("experiments", "experiment1")
+    experiment1_prism_path = os.path.join(experiment1_path, "prism")
+    experiment1_results_path = os.path.join(experiment1_path, "results")
+    experiment1_figures_path = os.path.join(experiment1_path, "figures")
+    
     experiment2_path = os.path.join("experiments", "experiment2")
     experiment2_prism_path = os.path.join(experiment2_path, "prism")
     experiment2_results_path = os.path.join(experiment2_path, "results")
+    experiment2_figures_path = os.path.join(experiment2_path, "figures")
+
+    experiment3_path = os.path.join("experiments", "experiment3")
+    experiment3_prism_path = os.path.join(experiment3_path, "prism")
+    experiment3_results_path = os.path.join(experiment3_path, "results")
+    experiment3_figures_path = os.path.join(experiment3_path, "figures")
+
     
-    figures3_path = os.path.join(experiment3_path, "figures")
-    figures2_path = os.path.join(experiment2_path, "figures")
-    
-    os.makedirs(figures3_path, exist_ok=True)
-    os.makedirs(figures2_path, exist_ok=True)
+    os.makedirs(experiment1_figures_path, exist_ok=True)
+    os.makedirs(experiment2_figures_path, exist_ok=True)
+    os.makedirs(experiment3_figures_path, exist_ok=True)
     plot_reward_figure(experiment3_results_path)
-    plot_reward_single_multi(experiment2_results_path)
+    plot_reward_single_multi(experiment1_prism_path, experiment1_results_path, experiment1_figures_path)
+    plot_reward_single_multi(experiment2_prism_path, experiment2_results_path, experiment2_figures_path)
     plot_time_size_figure(os.path.join(experiment3_path, "result.csv"))
     plot_mdp_size_tree_size_figure(os.path.join(experiment3_path, "result.csv"))
     plot_mdp_size_time_figure(os.path.join(experiment3_path, "result.csv"))
