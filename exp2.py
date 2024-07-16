@@ -11,7 +11,7 @@ def main():
     df = tree.to_dataframe()
     path_output = os.path.join(os.path.dirname(args.input),"../prism")
     prism_model = tp.get_prism_model_time(tree)
-    tp.save_prism_model(prism_model, os.path.join(path_output, "γ=1_time.prism"))
+    tp.save_prism_model(prism_model, os.path.join(path_output, "PANACEA.prism"))
 
     # save the properties file in the same directory as the output file
     tp.save_prism_properties(os.path.join(path_output, "properties.props"))

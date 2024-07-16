@@ -2,16 +2,16 @@ PRISM-games
 ===========
 
 Version: 3.2.1 (based on PRISM 4.8.dev)
-Date: Fri Jul 12 14:27:26 CEST 2024
+Date: Mon Jul 15 15:44:58 CEST 2024
 Hostname: pitagora
 Memory limits: cudd=10g, java(heap)=50g
-Command line: prism-games -javamaxmem 50g -cuddmaxmem 10g 'experiments/experiment2/prism/γ=1_time.prism' experiments/experiment2/prism/properties.props -prop 1 -exportstrat 'experiments/experiment2/results/γ=1_time/γ=1_time.dot'
+Command line: prism-games -javamaxmem 50g -cuddmaxmem 10g experiments/experiment2/prism/PANACEA.prism experiments/experiment2/prism/properties.props -prop 1 -exportstrat experiments/experiment2/results/PANACEA/PANACEA.dot
 
-Parsing model file "experiments/experiment2/prism/γ=1_time.prism"...
+Parsing model file "experiments/experiment2/prism/PANACEA.prism"...
 
 Type:        SMG
 Modules:     attacker defender
-Variables:   sched DataExfiltration AccesstoReverseShell AccesstoSensitiveFiles AccesstoExecuteArbitraryCode AccesstoMySQL WebReconSuccesful UnencryptedFiles CGIscriptsenabled VulnerableApacheHTTPServerVersion WebserverPubliclyExposed SOCKS5ProxyActive MisconfiguredApache progress progresspathTraversal progressgetFiles progressbufferOverflow progressgetLoginData progressexfiltrateData progresswebRecon time1 progressencryptFile progressreconfigureApache progressupdateApache progresschangeFilePermissions progressdisableCGIScripts progresschangeCredentials progressdeactivateSOCKS5Proxy time2
+Variables:   sched DataExfiltration AccesstoReverseShell AccesstoMySQL WebReconSuccesful AccesstoExecuteArbitraryCode AccesstoSensitiveFiles MisconfiguredApache WebserverPubliclyExposed CGIscriptsenabled SOCKS5ProxyActive VulnerableApacheHTTPServerVersion UnencryptedFiles progress progresswebRecon progressexfiltrateData progressgetLoginData progresspathTraversal progressgetFiles progressbufferOverflow time1 progressdeactivateSOCKS5Proxy progresschangeFilePermissions progressencryptFile progressreconfigureApache progressdisableCGIScripts progressupdateApache progresschangeCredentials time2
 
 Parsing properties file "experiments/experiment2/prism/properties.props"...
 
@@ -43,15 +43,15 @@ Building reward structure...
 
 Starting expected reachability...
 Starting Prob1 (maxmin)...
-Prob1 (maxmin) took 72 iterations and 0.188 seconds.
+Prob1 (maxmin) took 72 iterations and 0.214 seconds.
 target=278, inf=760, rest=3148
 Computing the upper bound where 0.5 is used instead of 0.0
 Starting value iteration (minmax)...
-Value iteration (minmax) took 36 iterations and 0.073 seconds.
+Value iteration (minmax) took 36 iterations and 0.067 seconds.
 Computed an over-approximation of the solution (in 0 seconds), this will now be used to get the solution
 Starting value iteration (minmax)...
-Value iteration (minmax) took 36 iterations and 0.045 seconds.
-Expected reachability took 0.325 seconds.
+Value iteration (minmax) took 36 iterations and 0.048 seconds.
+Expected reachability took 0.345 seconds.
 Building reward structure...
 
 Starting expected reachability...
@@ -60,39 +60,39 @@ Prob1 (maxmax) took 34 iterations and 0.08 seconds.
 target=346, inf=0, rest=3840
 Computing the upper bound where 5.0 is used instead of 0.0
 Starting value iteration (minmin)...
-Value iteration (minmin) took 39 iterations and 0.056 seconds.
+Value iteration (minmin) took 39 iterations and 0.058 seconds.
 Computed an over-approximation of the solution (in 0 seconds), this will now be used to get the solution
 Starting value iteration (minmin)...
 Value iteration (minmin) took 34 iterations and 0.048 seconds.
-Expected reachability took 0.187 seconds.
+Expected reachability took 0.19 seconds.
 
 Value in the initial state: 280.0
 
-Time for model checking: 0.574 seconds.
+Time for model checking: 0.599 seconds.
 
 Result: 280.0 (exact floating point)
 
-Exporting strategy as a dot file to file "experiments/experiment2/results/γ=1_time/γ=1_time.dot"...
+Exporting strategy as a dot file to file "experiments/experiment2/results/PANACEA/PANACEA.dot"...
 
 ---------------------------------------------------------------------
 
 Note: There were 2 warnings during computation.
 
-	Command being timed: "../prism-games-3.2.1-linux64-x86/bin/prism -javamaxmem 50g -cuddmaxmem 10g experiments/experiment2/prism/γ=1_time.prism experiments/experiment2/prism/properties.props -prop 1 -exportstrat experiments/experiment2/results/γ=1_time/γ=1_time.dot"
-	User time (seconds): 6.49
-	System time (seconds): 0.45
+	Command being timed: "../prism-games-3.2.1-linux64-x86/bin/prism -javamaxmem 50g -cuddmaxmem 10g experiments/experiment2/prism/PANACEA.prism experiments/experiment2/prism/properties.props -prop 1 -exportstrat experiments/experiment2/results/PANACEA/PANACEA.dot"
+	User time (seconds): 6.60
+	System time (seconds): 0.49
 	Percent of CPU this job got: 363%
-	Elapsed (wall clock) time (h:mm:ss or m:ss): 0:01.91
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 0:01.95
 	Average shared text size (kbytes): 0
 	Average unshared data size (kbytes): 0
 	Average stack size (kbytes): 0
 	Average total size (kbytes): 0
-	Maximum resident set size (kbytes): 406648
+	Maximum resident set size (kbytes): 421648
 	Average resident set size (kbytes): 0
 	Major (requiring I/O) page faults: 0
-	Minor (reclaiming a frame) page faults: 111694
-	Voluntary context switches: 10175
-	Involuntary context switches: 1188
+	Minor (reclaiming a frame) page faults: 115651
+	Voluntary context switches: 9527
+	Involuntary context switches: 1059
 	Swaps: 0
 	File system inputs: 0
 	File system outputs: 80

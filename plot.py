@@ -291,7 +291,7 @@ def plot_reward_single_multi(prism_path, result_path, figures_path):
     for experiment_name in sorted(os.listdir(result_path)):
         
         ar, dr = compute_rewards(experiment_name, prism_path)
-        to_plot['x'].append(experiment_name.replace("_", " ")[:10])
+        to_plot['x'].append(experiment_name.replace("_", " "))
         rewards['Att'].append(ar)
         rewards['Def'].append(dr)
         offset += 5
@@ -306,7 +306,7 @@ def plot_reward_single_multi(prism_path, result_path, figures_path):
     plt.xticks(x_values, to_plot['x'], fontsize=7)
     #plt.yticks(range(0, 7000, 1000))
     
-    plt.xlabel('Experiment')
+    #plt.xlabel('Experiment')
     plt.ylabel('Cost')
     plt.legend(loc='upper center', bbox_to_anchor=(0.5, 1.2), labelspacing=0.2, ncols=2, prop={'size': 6})
 

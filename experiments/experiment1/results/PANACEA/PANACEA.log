@@ -2,16 +2,16 @@ PRISM-games
 ===========
 
 Version: 3.2.1 (based on PRISM 4.8.dev)
-Date: Fri Jul 12 14:27:17 CEST 2024
+Date: Mon Jul 15 15:44:24 CEST 2024
 Hostname: pitagora
 Memory limits: cudd=10g, java(heap)=50g
-Command line: prism-games -javamaxmem 50g -cuddmaxmem 10g 'experiments/experiment1/prism/γ=1.prism' experiments/experiment1/prism/properties.props -prop 1 -exportstrat 'experiments/experiment1/results/γ=1/γ=1.dot'
+Command line: prism-games -javamaxmem 50g -cuddmaxmem 10g experiments/experiment1/prism/PANACEA.prism experiments/experiment1/prism/properties.props -prop 1 -exportstrat experiments/experiment1/results/PANACEA/PANACEA.dot
 
-Parsing model file "experiments/experiment1/prism/γ=1.prism"...
+Parsing model file "experiments/experiment1/prism/PANACEA.prism"...
 
 Type:        SMG
 Modules:     attacker defender
-Variables:   sched DataExfiltration AccesstoReverseShell WebReconSuccesful AccesstoExecuteArbitraryCode AccesstoSensitiveFiles AccesstoMySQL VulnerableApacheHTTPServerVersion SOCKS5ProxyActive MisconfiguredApache UnencryptedFiles WebserverPubliclyExposed CGIscriptsenabled exfiltrateData getLoginData bufferOverflow getFiles webRecon pathTraversal
+Variables:   sched DataExfiltration WebReconSuccesful AccesstoSensitiveFiles AccesstoExecuteArbitraryCode AccesstoReverseShell AccesstoMySQL CGIscriptsenabled WebserverPubliclyExposed UnencryptedFiles VulnerableApacheHTTPServerVersion MisconfiguredApache SOCKS5ProxyActive exfiltrateData getLoginData bufferOverflow getFiles webRecon pathTraversal
 
 Parsing properties file "experiments/experiment1/prism/properties.props"...
 
@@ -27,7 +27,7 @@ Warning: Switching to explicit engine to allow strategy generation.
 Building model...
 
 Computing reachable states... 300 states
-Reachable states exploration and model construction done in 0.044 secs.
+Reachable states exploration and model construction done in 0.045 secs.
 Sorting reachable states list...
 
 Time for model construction: 0.078 seconds.
@@ -51,12 +51,12 @@ Value iteration (minmax) took 10 iterations and 0.008 seconds.
 Computed an over-approximation of the solution (in 0 seconds), this will now be used to get the solution
 Starting value iteration (minmax)...
 Value iteration (minmax) took 8 iterations and 0.003 seconds.
-Expected reachability took 0.046 seconds.
+Expected reachability took 0.047 seconds.
 Building reward structure...
 
 Starting expected reachability...
 Starting Prob1 (maxmax)...
-Prob1 (maxmax) took 5 iterations and 0.003 seconds.
+Prob1 (maxmax) took 5 iterations and 0.002 seconds.
 target=106, inf=0, rest=194
 Computing the upper bound where 5.0 is used instead of 0.0
 Starting value iteration (minmin)...
@@ -68,31 +68,31 @@ Expected reachability took 0.007 seconds.
 
 Value in the initial state: 265.0
 
-Time for model checking: 0.073 seconds.
+Time for model checking: 0.075 seconds.
 
 Result: 265.0 (exact floating point)
 
-Exporting strategy as a dot file to file "experiments/experiment1/results/γ=1/γ=1.dot"...
+Exporting strategy as a dot file to file "experiments/experiment1/results/PANACEA/PANACEA.dot"...
 
 ---------------------------------------------------------------------
 
 Note: There were 2 warnings during computation.
 
-	Command being timed: "../prism-games-3.2.1-linux64-x86/bin/prism -javamaxmem 50g -cuddmaxmem 10g experiments/experiment1/prism/γ=1.prism experiments/experiment1/prism/properties.props -prop 1 -exportstrat experiments/experiment1/results/γ=1/γ=1.dot"
-	User time (seconds): 4.19
-	System time (seconds): 0.41
-	Percent of CPU this job got: 268%
-	Elapsed (wall clock) time (h:mm:ss or m:ss): 0:01.71
+	Command being timed: "../prism-games-3.2.1-linux64-x86/bin/prism -javamaxmem 50g -cuddmaxmem 10g experiments/experiment1/prism/PANACEA.prism experiments/experiment1/prism/properties.props -prop 1 -exportstrat experiments/experiment1/results/PANACEA/PANACEA.dot"
+	User time (seconds): 4.08
+	System time (seconds): 0.35
+	Percent of CPU this job got: 261%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 0:01.69
 	Average shared text size (kbytes): 0
 	Average unshared data size (kbytes): 0
 	Average stack size (kbytes): 0
 	Average total size (kbytes): 0
-	Maximum resident set size (kbytes): 337240
+	Maximum resident set size (kbytes): 328404
 	Average resident set size (kbytes): 0
 	Major (requiring I/O) page faults: 0
-	Minor (reclaiming a frame) page faults: 88897
-	Voluntary context switches: 10065
-	Involuntary context switches: 563
+	Minor (reclaiming a frame) page faults: 86995
+	Voluntary context switches: 8446
+	Involuntary context switches: 269
 	Swaps: 0
 	File system inputs: 0
 	File system outputs: 72
