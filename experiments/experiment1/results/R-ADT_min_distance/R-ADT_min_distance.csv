@@ -1,8 +1,0 @@
-action,step,sched,DataExfiltration,AccesstoExecuteArbitraryCode,AccesstoMySQL,WebReconSuccesful,AccesstoReverseShell,AccesstoSensitiveFiles,UnencryptedFiles,MisconfiguredApache,SOCKS5ProxyActive,WebserverPubliclyExposed,CGIscriptsenabled,VulnerableApacheHTTPServerVersion,exfiltrateData,getLoginData,bufferOverflow,getFiles,webRecon,pathTraversal,state_reward1,transition_reward1,state_reward2,transition_reward2
--,0,1,0,0,0,0,0,0,1,1,1,1,1,1,FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,0,5.0,0,0.0
-[webRecon],1,2,0,0,0,1,0,0,1,1,1,1,1,1,FALSE,FALSE,FALSE,FALSE,TRUE,FALSE,0,0.0,0,120.0
-[deactivateSOCKS5Proxy],2,1,0,0,0,1,0,0,1,1,2,1,1,1,FALSE,FALSE,FALSE,FALSE,TRUE,FALSE,0,20.0,0,0.0
-[pathTraversal],3,2,0,0,0,1,1,0,1,1,2,1,1,1,FALSE,FALSE,FALSE,FALSE,TRUE,TRUE,0,0.0,0,150.0
-[encryptFile],4,1,0,0,0,1,1,0,2,1,2,1,1,1,FALSE,FALSE,FALSE,FALSE,TRUE,TRUE,0,30.0,0,0.0
-[getFiles],5,2,0,0,0,1,1,1,2,1,2,1,1,1,FALSE,FALSE,FALSE,TRUE,TRUE,TRUE,0,0.0,0,60.0
-[changeFilePermissions],6,1,0,0,0,1,1,2,2,1,2,1,1,1,FALSE,FALSE,FALSE,TRUE,TRUE,TRUE,0,?,0,?

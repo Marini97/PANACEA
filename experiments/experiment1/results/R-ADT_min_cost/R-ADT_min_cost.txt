@@ -1,7 +1,0 @@
-action step sched DataExfiltration AccesstoExecuteArbitraryCode AccesstoMySQL WebReconSuccesful AccesstoReverseShell AccesstoSensitiveFiles UnencryptedFiles MisconfiguredApache SOCKS5ProxyActive WebserverPubliclyExposed CGIscriptsenabled VulnerableApacheHTTPServerVersion exfiltrateData getLoginData bufferOverflow getFiles webRecon pathTraversal state_reward1 transition_reward1 state_reward2 transition_reward2
-- 0 1 0 0 0 0 0 0 1 1 1 1 1 1 false false false false false false 0.0 5.0 0.0 0.0
-[webRecon] 1 2 0 0 0 1 0 0 1 1 1 1 1 1 false false false false true false 0.0 0.0 0.0 20.0
-[updateApache] 2 1 0 0 0 1 0 0 1 1 1 1 1 2 false false false false true false 0.0 40.0 0.0 0.0
-[bufferOverflow] 3 2 0 1 0 1 0 0 1 1 1 1 1 2 false false true false true false 0.0 0.0 0.0 45.0
-[disableCGIScripts] 4 1 0 1 0 1 0 0 1 1 1 1 2 2 false false true false true false 0.0 50.0 0.0 500.0
-[exfiltrateData] 5 2 1 1 0 1 0 0 1 1 1 1 2 2 true false true false true false 0.0 ? 0.0 ?

@@ -14,16 +14,16 @@ global sched : [1..2];
 global DataExfiltration : [0..1];
 label "terminate" = DataExfiltration=1;
 
-global WebReconSuccesful : [0..2];
-global AccesstoSensitiveFiles : [0..2];
-global AccesstoExecuteArbitraryCode : [0..2];
-global AccesstoReverseShell : [0..2];
 global AccesstoMySQL : [0..2];
-global CGIscriptsenabled : [1..2];
+global AccesstoSensitiveFiles : [0..2];
+global AccesstoReverseShell : [0..2];
+global AccesstoExecuteArbitraryCode : [0..2];
+global WebReconSuccesful : [0..2];
 global WebserverPubliclyExposed : [1..2];
 global UnencryptedFiles : [1..2];
-global VulnerableApacheHTTPServerVersion : [1..2];
 global MisconfiguredApache : [1..2];
+global VulnerableApacheHTTPServerVersion : [1..2];
+global CGIscriptsenabled : [1..2];
 global SOCKS5ProxyActive : [1..2];
 
 module attacker
@@ -35,12 +35,12 @@ module attacker
 	webRecon : bool;
 	pathTraversal : bool;
 
-	[exfiltrateData] sched=1 & !DataExfiltration=1 & DataExfiltration=0 & !exfiltrateData & (AccesstoExecuteArbitraryCode=1 | AccesstoMySQL=1) -> (DataExfiltration'=1) & (exfiltrateData'=true) & (sched'=2);
+	[exfiltrateData] sched=1 & !DataExfiltration=1 & DataExfiltration=0 & !exfiltrateData & (AccesstoMySQL=1 | AccesstoExecuteArbitraryCode=1) -> (DataExfiltration'=1) & (exfiltrateData'=true) & (sched'=2);
 	[getLoginData] sched=1 & !DataExfiltration=1 & AccesstoMySQL=0 & !getLoginData & (AccesstoSensitiveFiles=1 & UnencryptedFiles=1) -> (AccesstoMySQL'=1) & (getLoginData'=true) & (sched'=2);
-	[bufferOverflow] sched=1 & !DataExfiltration=1 & AccesstoExecuteArbitraryCode=0 & !bufferOverflow & (WebReconSuccesful=1 & SOCKS5ProxyActive=1) -> (AccesstoExecuteArbitraryCode'=1) & (bufferOverflow'=true) & (sched'=2);
+	[bufferOverflow] sched=1 & !DataExfiltration=1 & AccesstoExecuteArbitraryCode=0 & !bufferOverflow & (SOCKS5ProxyActive=1 & WebReconSuccesful=1) -> (AccesstoExecuteArbitraryCode'=1) & (bufferOverflow'=true) & (sched'=2);
 	[getFiles] sched=1 & !DataExfiltration=1 & AccesstoSensitiveFiles=0 & !getFiles & (MisconfiguredApache=1 & AccesstoReverseShell=1) -> (AccesstoSensitiveFiles'=1) & (getFiles'=true) & (sched'=2);
 	[webRecon] sched=1 & !DataExfiltration=1 & WebReconSuccesful=0 & !webRecon & (WebserverPubliclyExposed=1) -> (WebReconSuccesful'=1) & (webRecon'=true) & (sched'=2);
-	[pathTraversal] sched=1 & !DataExfiltration=1 & AccesstoReverseShell=0 & !pathTraversal & (VulnerableApacheHTTPServerVersion=1 & CGIscriptsenabled=1 & WebReconSuccesful=1) -> (AccesstoReverseShell'=1) & (pathTraversal'=true) & (sched'=2);
+	[pathTraversal] sched=1 & !DataExfiltration=1 & AccesstoReverseShell=0 & !pathTraversal & (CGIscriptsenabled=1 & VulnerableApacheHTTPServerVersion=1 & WebReconSuccesful=1) -> (AccesstoReverseShell'=1) & (pathTraversal'=true) & (sched'=2);
 
 endmodule
 

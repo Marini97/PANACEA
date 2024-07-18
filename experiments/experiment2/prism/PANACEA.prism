@@ -79,7 +79,7 @@ module defender
 	time2 : [-1..5];
 	[wait2] sched=2 & time2>0 -> (sched'=1) & (time2'=time2-1);
 
-	[startchangeCredentials] sched=2 & time2<0 & !progresschangeCredentials & !DataExfiltration=1 & !AccesstoMySQL=2 -> (sched'=1) & (time2'=2) & (progresschangeCredentials'=true);
+	[1] sched=2 & time2<0 & !progresschangeCredentials & !DataExfiltration=1 & !AccesstoMySQL=2 -> (sched'=1) & (time2'=2) & (progresschangeCredentials'=true);
 	[endchangeCredentials] sched=2 & time2=0 & progresschangeCredentials & !DataExfiltration=1 & !AccesstoMySQL=2 -> (time2'=time2-1) & (progresschangeCredentials'=false) & (AccesstoMySQL'=2);
 
 	[startchangeFilePermissions] sched=2 & time2<0 & !progresschangeFilePermissions & !DataExfiltration=1 & !AccesstoSensitiveFiles=2 -> (sched'=1) & (time2'=2) & (progresschangeFilePermissions'=true);
