@@ -1,4 +1,4 @@
-DIRECTORY=experiments/experiment1
+DIRECTORY=experiment2
 PRISM_PATH=../prism-games-3.2.1-linux64-x86
 JVM_MEMORY=$1
 CUDD_MEMORY=$2
@@ -11,7 +11,7 @@ mkdir "$DIRECTORY"/results/
 for TREE_FILE in "$DIRECTORY"/trees/*.xml; do
     BASENAME=$(basename "$TREE_FILE" .xml)
     
-    python3 exp1.py -i "$TREE_FILE"
+    python3 utils/exp2.py -i "$TREE_FILE"
 done
 
 # Loop over each .prism file in the directory
@@ -37,7 +37,7 @@ for MODEL_FILE in "$DIRECTORY"/prism/*.prism; do
 
 done
 
-# copy the gamma=0 files inside folders
+  # copy the gamma=0 files inside folders
 for FOLDER in "$DIRECTORY"/*; do
   if [[ $FOLDER != *"figures"* ]] && [[ $FOLDER != *"prism"* ]] && [[ $FOLDER != *"results"* ]] && [[ $FOLDER != *"trees"* ]]; then
     cp -r $FOLDER "$DIRECTORY"/results/

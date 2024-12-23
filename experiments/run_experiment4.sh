@@ -1,4 +1,4 @@
-DIRECTORY=experiments/experiment4
+DIRECTORY=experiment4
 PRISM_PATH=../prism-games-3.2.1-linux64-x86
 JVM_MEMORY=$1
 CUDD_MEMORY=$2
@@ -11,7 +11,7 @@ mkdir "$DIRECTORY"/results/
 for TREE_FILE in "$DIRECTORY"/trees/*.xml; do
     BASENAME=$(basename "$TREE_FILE" .xml)
     
-    python3 exp3.py -i "$TREE_FILE"
+    python3 utils/exp4.py -i "$TREE_FILE"
 done
 
 # Loop over each .prism file in the directory
