@@ -1,0 +1,1941 @@
+{
+  "metadata": {
+    "goal": "DataExfiltration",
+    "actions_to_goal": [
+      "exfiltrateData"
+    ],
+    "initial_attributes": [
+      "UnencryptedFiles",
+      "SOCKS5ProxyActive",
+      "MisconfiguredApache",
+      "WebserverPubliclyExposed",
+      "CGIscriptsenabled",
+      "VulnerableApacheHTTPServerVersion",
+      "WebserverPubliclyExposed"
+    ],
+    "environment_type": "attack_defense_tree",
+    "time_based": true
+  },
+  "state_space": {
+    "DataExfiltration": {
+      "type": "discrete",
+      "low": 0,
+      "high": 1,
+      "description": "Goal achievement state"
+    },
+    "current_player": {
+      "type": "discrete",
+      "low": 0,
+      "high": 1,
+      "description": "Current player (0=attacker, 1=defender)"
+    },
+    "AccesstoExecuteArbitraryCode": {
+      "type": "discrete",
+      "low": 0,
+      "high": 2,
+      "description": "Attacker attribute: AccesstoExecuteArbitraryCode"
+    },
+    "AccesstoMySQL": {
+      "type": "discrete",
+      "low": 0,
+      "high": 2,
+      "description": "Attacker attribute: AccesstoMySQL"
+    },
+    "WebReconSuccesful": {
+      "type": "discrete",
+      "low": 0,
+      "high": 2,
+      "description": "Attacker attribute: WebReconSuccesful"
+    },
+    "AccesstoSensitiveFiles": {
+      "type": "discrete",
+      "low": 0,
+      "high": 2,
+      "description": "Attacker attribute: AccesstoSensitiveFiles"
+    },
+    "AccesstoReverseShell": {
+      "type": "discrete",
+      "low": 0,
+      "high": 2,
+      "description": "Attacker attribute: AccesstoReverseShell"
+    },
+    "UnencryptedFiles": {
+      "type": "discrete",
+      "low": 1,
+      "high": 2,
+      "description": "Initial system attribute: UnencryptedFiles"
+    },
+    "SOCKS5ProxyActive": {
+      "type": "discrete",
+      "low": 1,
+      "high": 2,
+      "description": "Initial system attribute: SOCKS5ProxyActive"
+    },
+    "MisconfiguredApache": {
+      "type": "discrete",
+      "low": 1,
+      "high": 2,
+      "description": "Initial system attribute: MisconfiguredApache"
+    },
+    "WebserverPubliclyExposed": {
+      "type": "discrete",
+      "low": 1,
+      "high": 2,
+      "description": "Initial system attribute: WebserverPubliclyExposed"
+    },
+    "CGIscriptsenabled": {
+      "type": "discrete",
+      "low": 1,
+      "high": 2,
+      "description": "Initial system attribute: CGIscriptsenabled"
+    },
+    "VulnerableApacheHTTPServerVersion": {
+      "type": "discrete",
+      "low": 1,
+      "high": 2,
+      "description": "Initial system attribute: VulnerableApacheHTTPServerVersion"
+    },
+    "progress_exfiltrateData": {
+      "type": "discrete",
+      "low": 0,
+      "high": 1,
+      "description": "Progress state for attacker action: exfiltrateData"
+    },
+    "progress_getLoginData": {
+      "type": "discrete",
+      "low": 0,
+      "high": 1,
+      "description": "Progress state for attacker action: getLoginData"
+    },
+    "progress_bufferOverflow": {
+      "type": "discrete",
+      "low": 0,
+      "high": 1,
+      "description": "Progress state for attacker action: bufferOverflow"
+    },
+    "progress_getFiles": {
+      "type": "discrete",
+      "low": 0,
+      "high": 1,
+      "description": "Progress state for attacker action: getFiles"
+    },
+    "progress_webRecon": {
+      "type": "discrete",
+      "low": 0,
+      "high": 1,
+      "description": "Progress state for attacker action: webRecon"
+    },
+    "progress_pathTraversal": {
+      "type": "discrete",
+      "low": 0,
+      "high": 1,
+      "description": "Progress state for attacker action: pathTraversal"
+    },
+    "progress_changeCredentials": {
+      "type": "discrete",
+      "low": 0,
+      "high": 1,
+      "description": "Progress state for defender action: changeCredentials"
+    },
+    "progress_changeFilePermissions": {
+      "type": "discrete",
+      "low": 0,
+      "high": 1,
+      "description": "Progress state for defender action: changeFilePermissions"
+    },
+    "progress_encryptFile": {
+      "type": "discrete",
+      "low": 0,
+      "high": 1,
+      "description": "Progress state for defender action: encryptFile"
+    },
+    "progress_deactivateSOCKS5Proxy": {
+      "type": "discrete",
+      "low": 0,
+      "high": 1,
+      "description": "Progress state for defender action: deactivateSOCKS5Proxy"
+    },
+    "progress_reconfigureApache": {
+      "type": "discrete",
+      "low": 0,
+      "high": 1,
+      "description": "Progress state for defender action: reconfigureApache"
+    },
+    "progress_disableCGIScripts": {
+      "type": "discrete",
+      "low": 0,
+      "high": 1,
+      "description": "Progress state for defender action: disableCGIScripts"
+    },
+    "progress_updateApache": {
+      "type": "discrete",
+      "low": 0,
+      "high": 1,
+      "description": "Progress state for defender action: updateApache"
+    },
+    "time_attacker": {
+      "type": "discrete",
+      "low": -1,
+      "high": 2,
+      "description": "Time counter for attacker (-1 means can act immediately)"
+    },
+    "time_defender": {
+      "type": "discrete",
+      "low": -1,
+      "high": 20,
+      "description": "Time counter for defender (-1 means can act immediately)"
+    }
+  },
+  "action_space": {
+    "attacker": {
+      "type": "discrete",
+      "actions": {
+        "0": {
+          "name": "start_exfiltrateData",
+          "preconditions": {
+            "conditions": [
+              "AccesstoExecuteArbitraryCode",
+              "AccesstoMySQL",
+              "time_attacker < 0",
+              "progress_exfiltrateData == 0"
+            ],
+            "logic": "AND",
+            "required_values": {
+              "AccesstoExecuteArbitraryCode": 1,
+              "AccesstoMySQL": 1
+            }
+          },
+          "effect": null,
+          "cost": 50,
+          "time": 2,
+          "refinement": "disjunctive",
+          "action_type": "start"
+        },
+        "1": {
+          "name": "end_exfiltrateData",
+          "preconditions": {
+            "conditions": [
+              "AccesstoExecuteArbitraryCode",
+              "AccesstoMySQL",
+              "time_attacker == 0",
+              "progress_exfiltrateData == 1"
+            ],
+            "logic": "AND",
+            "required_values": {
+              "AccesstoExecuteArbitraryCode": 1,
+              "AccesstoMySQL": 1
+            }
+          },
+          "effect": "DataExfiltration",
+          "cost": 0,
+          "time": 0,
+          "refinement": "disjunctive",
+          "action_type": "end"
+        },
+        "2": {
+          "name": "fail_exfiltrateData",
+          "preconditions": {
+            "conditions": [
+              "time_attacker == 0",
+              "progress_exfiltrateData == 1",
+              "AccesstoExecuteArbitraryCode != 1 & AccesstoMySQL != 1"
+            ],
+            "logic": "AND",
+            "required_values": {}
+          },
+          "effect": null,
+          "cost": 0,
+          "time": 0,
+          "refinement": "disjunctive",
+          "action_type": "fail"
+        },
+        "3": {
+          "name": "start_getLoginData",
+          "preconditions": {
+            "conditions": [
+              "UnencryptedFiles",
+              "AccesstoSensitiveFiles",
+              "time_attacker < 0",
+              "progress_getLoginData == 0"
+            ],
+            "logic": "AND",
+            "required_values": {
+              "UnencryptedFiles": 1,
+              "AccesstoSensitiveFiles": 1
+            }
+          },
+          "effect": null,
+          "cost": 10,
+          "time": 2,
+          "refinement": "conjunctive",
+          "action_type": "start"
+        },
+        "4": {
+          "name": "end_getLoginData",
+          "preconditions": {
+            "conditions": [
+              "UnencryptedFiles",
+              "AccesstoSensitiveFiles",
+              "time_attacker == 0",
+              "progress_getLoginData == 1"
+            ],
+            "logic": "AND",
+            "required_values": {
+              "UnencryptedFiles": 1,
+              "AccesstoSensitiveFiles": 1
+            }
+          },
+          "effect": "AccesstoMySQL",
+          "cost": 0,
+          "time": 0,
+          "refinement": "conjunctive",
+          "action_type": "end"
+        },
+        "5": {
+          "name": "fail_getLoginData",
+          "preconditions": {
+            "conditions": [
+              "time_attacker == 0",
+              "progress_getLoginData == 1",
+              "UnencryptedFiles != 1 | AccesstoSensitiveFiles != 1"
+            ],
+            "logic": "AND",
+            "required_values": {}
+          },
+          "effect": null,
+          "cost": 0,
+          "time": 0,
+          "refinement": "conjunctive",
+          "action_type": "fail"
+        },
+        "6": {
+          "name": "start_bufferOverflow",
+          "preconditions": {
+            "conditions": [
+              "WebReconSuccesful",
+              "SOCKS5ProxyActive",
+              "time_attacker < 0",
+              "progress_bufferOverflow == 0"
+            ],
+            "logic": "AND",
+            "required_values": {
+              "WebReconSuccesful": 1,
+              "SOCKS5ProxyActive": 1
+            }
+          },
+          "effect": null,
+          "cost": 40,
+          "time": 2,
+          "refinement": "conjunctive",
+          "action_type": "start"
+        },
+        "7": {
+          "name": "end_bufferOverflow",
+          "preconditions": {
+            "conditions": [
+              "WebReconSuccesful",
+              "SOCKS5ProxyActive",
+              "time_attacker == 0",
+              "progress_bufferOverflow == 1"
+            ],
+            "logic": "AND",
+            "required_values": {
+              "WebReconSuccesful": 1,
+              "SOCKS5ProxyActive": 1
+            }
+          },
+          "effect": "AccesstoExecuteArbitraryCode",
+          "cost": 0,
+          "time": 0,
+          "refinement": "conjunctive",
+          "action_type": "end"
+        },
+        "8": {
+          "name": "fail_bufferOverflow",
+          "preconditions": {
+            "conditions": [
+              "time_attacker == 0",
+              "progress_bufferOverflow == 1",
+              "WebReconSuccesful != 1 | SOCKS5ProxyActive != 1"
+            ],
+            "logic": "AND",
+            "required_values": {}
+          },
+          "effect": null,
+          "cost": 0,
+          "time": 0,
+          "refinement": "conjunctive",
+          "action_type": "fail"
+        },
+        "9": {
+          "name": "start_getFiles",
+          "preconditions": {
+            "conditions": [
+              "MisconfiguredApache",
+              "AccesstoReverseShell",
+              "time_attacker < 0",
+              "progress_getFiles == 0"
+            ],
+            "logic": "AND",
+            "required_values": {
+              "MisconfiguredApache": 1,
+              "AccesstoReverseShell": 1
+            }
+          },
+          "effect": null,
+          "cost": 30,
+          "time": 2,
+          "refinement": "conjunctive",
+          "action_type": "start"
+        },
+        "10": {
+          "name": "end_getFiles",
+          "preconditions": {
+            "conditions": [
+              "MisconfiguredApache",
+              "AccesstoReverseShell",
+              "time_attacker == 0",
+              "progress_getFiles == 1"
+            ],
+            "logic": "AND",
+            "required_values": {
+              "MisconfiguredApache": 1,
+              "AccesstoReverseShell": 1
+            }
+          },
+          "effect": "AccesstoSensitiveFiles",
+          "cost": 0,
+          "time": 0,
+          "refinement": "conjunctive",
+          "action_type": "end"
+        },
+        "11": {
+          "name": "fail_getFiles",
+          "preconditions": {
+            "conditions": [
+              "time_attacker == 0",
+              "progress_getFiles == 1",
+              "MisconfiguredApache != 1 | AccesstoReverseShell != 1"
+            ],
+            "logic": "AND",
+            "required_values": {}
+          },
+          "effect": null,
+          "cost": 0,
+          "time": 0,
+          "refinement": "conjunctive",
+          "action_type": "fail"
+        },
+        "12": {
+          "name": "start_webRecon",
+          "preconditions": {
+            "conditions": [
+              "WebserverPubliclyExposed",
+              "WebserverPubliclyExposed",
+              "time_attacker < 0",
+              "progress_webRecon == 0"
+            ],
+            "logic": "AND",
+            "required_values": {
+              "WebserverPubliclyExposed": 1
+            }
+          },
+          "effect": null,
+          "cost": 5,
+          "time": 1,
+          "refinement": "disjunctive",
+          "action_type": "start"
+        },
+        "13": {
+          "name": "end_webRecon",
+          "preconditions": {
+            "conditions": [
+              "WebserverPubliclyExposed",
+              "WebserverPubliclyExposed",
+              "time_attacker == 0",
+              "progress_webRecon == 1"
+            ],
+            "logic": "AND",
+            "required_values": {
+              "WebserverPubliclyExposed": 1
+            }
+          },
+          "effect": "WebReconSuccesful",
+          "cost": 0,
+          "time": 0,
+          "refinement": "disjunctive",
+          "action_type": "end"
+        },
+        "14": {
+          "name": "fail_webRecon",
+          "preconditions": {
+            "conditions": [
+              "time_attacker == 0",
+              "progress_webRecon == 1",
+              "WebserverPubliclyExposed != 1 & WebserverPubliclyExposed != 1"
+            ],
+            "logic": "AND",
+            "required_values": {}
+          },
+          "effect": null,
+          "cost": 0,
+          "time": 0,
+          "refinement": "disjunctive",
+          "action_type": "fail"
+        },
+        "15": {
+          "name": "start_pathTraversal",
+          "preconditions": {
+            "conditions": [
+              "WebReconSuccesful",
+              "CGIscriptsenabled",
+              "VulnerableApacheHTTPServerVersion",
+              "time_attacker < 0",
+              "progress_pathTraversal == 0"
+            ],
+            "logic": "AND",
+            "required_values": {
+              "WebReconSuccesful": 1,
+              "CGIscriptsenabled": 1,
+              "VulnerableApacheHTTPServerVersion": 1
+            }
+          },
+          "effect": null,
+          "cost": 20,
+          "time": 2,
+          "refinement": "conjunctive",
+          "action_type": "start"
+        },
+        "16": {
+          "name": "end_pathTraversal",
+          "preconditions": {
+            "conditions": [
+              "WebReconSuccesful",
+              "CGIscriptsenabled",
+              "VulnerableApacheHTTPServerVersion",
+              "time_attacker == 0",
+              "progress_pathTraversal == 1"
+            ],
+            "logic": "AND",
+            "required_values": {
+              "WebReconSuccesful": 1,
+              "CGIscriptsenabled": 1,
+              "VulnerableApacheHTTPServerVersion": 1
+            }
+          },
+          "effect": "AccesstoReverseShell",
+          "cost": 0,
+          "time": 0,
+          "refinement": "conjunctive",
+          "action_type": "end"
+        },
+        "17": {
+          "name": "fail_pathTraversal",
+          "preconditions": {
+            "conditions": [
+              "time_attacker == 0",
+              "progress_pathTraversal == 1",
+              "WebReconSuccesful != 1 | CGIscriptsenabled != 1 | VulnerableApacheHTTPServerVersion != 1"
+            ],
+            "logic": "AND",
+            "required_values": {}
+          },
+          "effect": null,
+          "cost": 0,
+          "time": 0,
+          "refinement": "conjunctive",
+          "action_type": "fail"
+        },
+        "18": {
+          "name": "wait_attacker",
+          "preconditions": {
+            "conditions": [
+              "time_attacker > 0"
+            ],
+            "logic": "AND",
+            "required_values": {}
+          },
+          "effect": null,
+          "cost": 0,
+          "time": 0,
+          "refinement": null,
+          "action_type": "wait"
+        }
+      }
+    },
+    "defender": {
+      "type": "discrete",
+      "actions": {
+        "0": {
+          "name": "start_changeCredentials",
+          "preconditions": {
+            "conditions": [
+              "time_defender < 0",
+              "progress_changeCredentials == 0"
+            ],
+            "logic": "AND",
+            "required_values": {}
+          },
+          "effect": null,
+          "cost": 200,
+          "time": 2,
+          "refinement": "conjunctive",
+          "action_type": "start"
+        },
+        "1": {
+          "name": "end_changeCredentials",
+          "preconditions": {
+            "conditions": [
+              "time_defender == 0",
+              "progress_changeCredentials == 1"
+            ],
+            "logic": "AND",
+            "required_values": {}
+          },
+          "effect": "AccesstoMySQL",
+          "cost": 0,
+          "time": 0,
+          "refinement": "conjunctive",
+          "action_type": "end"
+        },
+        "2": {
+          "name": "fail_changeCredentials",
+          "preconditions": {
+            "conditions": [
+              "time_defender == 0",
+              "progress_changeCredentials == 1"
+            ],
+            "logic": "AND",
+            "required_values": {}
+          },
+          "effect": null,
+          "cost": 0,
+          "time": 0,
+          "refinement": "conjunctive",
+          "action_type": "fail"
+        },
+        "3": {
+          "name": "start_changeFilePermissions",
+          "preconditions": {
+            "conditions": [
+              "time_defender < 0",
+              "progress_changeFilePermissions == 0"
+            ],
+            "logic": "AND",
+            "required_values": {}
+          },
+          "effect": null,
+          "cost": 60,
+          "time": 2,
+          "refinement": "conjunctive",
+          "action_type": "start"
+        },
+        "4": {
+          "name": "end_changeFilePermissions",
+          "preconditions": {
+            "conditions": [
+              "time_defender == 0",
+              "progress_changeFilePermissions == 1"
+            ],
+            "logic": "AND",
+            "required_values": {}
+          },
+          "effect": "AccesstoSensitiveFiles",
+          "cost": 0,
+          "time": 0,
+          "refinement": "conjunctive",
+          "action_type": "end"
+        },
+        "5": {
+          "name": "fail_changeFilePermissions",
+          "preconditions": {
+            "conditions": [
+              "time_defender == 0",
+              "progress_changeFilePermissions == 1"
+            ],
+            "logic": "AND",
+            "required_values": {}
+          },
+          "effect": null,
+          "cost": 0,
+          "time": 0,
+          "refinement": "conjunctive",
+          "action_type": "fail"
+        },
+        "6": {
+          "name": "start_encryptFile",
+          "preconditions": {
+            "conditions": [
+              "time_defender < 0",
+              "progress_encryptFile == 0"
+            ],
+            "logic": "AND",
+            "required_values": {}
+          },
+          "effect": null,
+          "cost": 150,
+          "time": 5,
+          "refinement": "disjunctive",
+          "action_type": "start"
+        },
+        "7": {
+          "name": "end_encryptFile",
+          "preconditions": {
+            "conditions": [
+              "time_defender == 0",
+              "progress_encryptFile == 1"
+            ],
+            "logic": "AND",
+            "required_values": {}
+          },
+          "effect": "UnencryptedFiles",
+          "cost": 0,
+          "time": 0,
+          "refinement": "disjunctive",
+          "action_type": "end"
+        },
+        "8": {
+          "name": "fail_encryptFile",
+          "preconditions": {
+            "conditions": [
+              "time_defender == 0",
+              "progress_encryptFile == 1"
+            ],
+            "logic": "AND",
+            "required_values": {}
+          },
+          "effect": null,
+          "cost": 0,
+          "time": 0,
+          "refinement": "disjunctive",
+          "action_type": "fail"
+        },
+        "9": {
+          "name": "start_deactivateSOCKS5Proxy",
+          "preconditions": {
+            "conditions": [
+              "time_defender < 0",
+              "progress_deactivateSOCKS5Proxy == 0"
+            ],
+            "logic": "AND",
+            "required_values": {}
+          },
+          "effect": null,
+          "cost": 120,
+          "time": 1,
+          "refinement": "conjunctive",
+          "action_type": "start"
+        },
+        "10": {
+          "name": "end_deactivateSOCKS5Proxy",
+          "preconditions": {
+            "conditions": [
+              "time_defender == 0",
+              "progress_deactivateSOCKS5Proxy == 1"
+            ],
+            "logic": "AND",
+            "required_values": {}
+          },
+          "effect": "SOCKS5ProxyActive",
+          "cost": 0,
+          "time": 0,
+          "refinement": "conjunctive",
+          "action_type": "end"
+        },
+        "11": {
+          "name": "fail_deactivateSOCKS5Proxy",
+          "preconditions": {
+            "conditions": [
+              "time_defender == 0",
+              "progress_deactivateSOCKS5Proxy == 1"
+            ],
+            "logic": "AND",
+            "required_values": {}
+          },
+          "effect": null,
+          "cost": 0,
+          "time": 0,
+          "refinement": "conjunctive",
+          "action_type": "fail"
+        },
+        "12": {
+          "name": "start_reconfigureApache",
+          "preconditions": {
+            "conditions": [
+              "time_defender < 0",
+              "progress_reconfigureApache == 0"
+            ],
+            "logic": "AND",
+            "required_values": {}
+          },
+          "effect": null,
+          "cost": 50,
+          "time": 2,
+          "refinement": "conjunctive",
+          "action_type": "start"
+        },
+        "13": {
+          "name": "end_reconfigureApache",
+          "preconditions": {
+            "conditions": [
+              "time_defender == 0",
+              "progress_reconfigureApache == 1"
+            ],
+            "logic": "AND",
+            "required_values": {}
+          },
+          "effect": "MisconfiguredApache",
+          "cost": 0,
+          "time": 0,
+          "refinement": "conjunctive",
+          "action_type": "end"
+        },
+        "14": {
+          "name": "fail_reconfigureApache",
+          "preconditions": {
+            "conditions": [
+              "time_defender == 0",
+              "progress_reconfigureApache == 1"
+            ],
+            "logic": "AND",
+            "required_values": {}
+          },
+          "effect": null,
+          "cost": 0,
+          "time": 0,
+          "refinement": "conjunctive",
+          "action_type": "fail"
+        },
+        "15": {
+          "name": "start_disableCGIScripts",
+          "preconditions": {
+            "conditions": [
+              "time_defender < 0",
+              "progress_disableCGIScripts == 0"
+            ],
+            "logic": "AND",
+            "required_values": {}
+          },
+          "effect": null,
+          "cost": 45,
+          "time": 1,
+          "refinement": "conjunctive",
+          "action_type": "start"
+        },
+        "16": {
+          "name": "end_disableCGIScripts",
+          "preconditions": {
+            "conditions": [
+              "time_defender == 0",
+              "progress_disableCGIScripts == 1"
+            ],
+            "logic": "AND",
+            "required_values": {}
+          },
+          "effect": "CGIscriptsenabled",
+          "cost": 0,
+          "time": 0,
+          "refinement": "conjunctive",
+          "action_type": "end"
+        },
+        "17": {
+          "name": "fail_disableCGIScripts",
+          "preconditions": {
+            "conditions": [
+              "time_defender == 0",
+              "progress_disableCGIScripts == 1"
+            ],
+            "logic": "AND",
+            "required_values": {}
+          },
+          "effect": null,
+          "cost": 0,
+          "time": 0,
+          "refinement": "conjunctive",
+          "action_type": "fail"
+        },
+        "18": {
+          "name": "start_updateApache",
+          "preconditions": {
+            "conditions": [
+              "time_defender < 0",
+              "progress_updateApache == 0"
+            ],
+            "logic": "AND",
+            "required_values": {}
+          },
+          "effect": null,
+          "cost": 20,
+          "time": 20,
+          "refinement": "conjunctive",
+          "action_type": "start"
+        },
+        "19": {
+          "name": "end_updateApache",
+          "preconditions": {
+            "conditions": [
+              "time_defender == 0",
+              "progress_updateApache == 1"
+            ],
+            "logic": "AND",
+            "required_values": {}
+          },
+          "effect": "VulnerableApacheHTTPServerVersion",
+          "cost": 0,
+          "time": 0,
+          "refinement": "conjunctive",
+          "action_type": "end"
+        },
+        "20": {
+          "name": "fail_updateApache",
+          "preconditions": {
+            "conditions": [
+              "time_defender == 0",
+              "progress_updateApache == 1"
+            ],
+            "logic": "AND",
+            "required_values": {}
+          },
+          "effect": null,
+          "cost": 0,
+          "time": 0,
+          "refinement": "conjunctive",
+          "action_type": "fail"
+        },
+        "21": {
+          "name": "wait_defender",
+          "preconditions": {
+            "conditions": [
+              "time_defender > 0"
+            ],
+            "logic": "AND",
+            "required_values": {}
+          },
+          "effect": null,
+          "cost": 0,
+          "time": 0,
+          "refinement": null,
+          "action_type": "wait"
+        }
+      }
+    }
+  },
+  "transitions": {
+    "attacker": {
+      "start_exfiltrateData": {
+        "preconditions": {
+          "conditions": [
+            "AccesstoExecuteArbitraryCode",
+            "AccesstoMySQL",
+            "time_attacker < 0",
+            "progress_exfiltrateData == 0"
+          ],
+          "logic": "AND"
+        },
+        "effects": {
+          "progress_exfiltrateData": 1,
+          "time_attacker": 2,
+          "current_player": 1
+        },
+        "failure_conditions": {
+          "conditions": [
+            "time_attacker >= 0",
+            "progress_exfiltrateData != 0",
+            "AccesstoExecuteArbitraryCode != 1",
+            "AccesstoMySQL != 1"
+          ],
+          "logic": "OR"
+        }
+      },
+      "end_exfiltrateData": {
+        "preconditions": {
+          "conditions": [
+            "AccesstoExecuteArbitraryCode",
+            "AccesstoMySQL",
+            "time_attacker == 0",
+            "progress_exfiltrateData == 1"
+          ],
+          "logic": "AND"
+        },
+        "effects": {
+          "DataExfiltration": 1,
+          "progress_exfiltrateData": 0,
+          "time_attacker": -1,
+          "current_player": 1
+        },
+        "failure_conditions": {
+          "conditions": [
+            "time_attacker != 0",
+            "progress_exfiltrateData != 1",
+            "AccesstoExecuteArbitraryCode != 1",
+            "AccesstoMySQL != 1"
+          ],
+          "logic": "OR"
+        }
+      },
+      "fail_exfiltrateData": {
+        "preconditions": {
+          "conditions": [
+            "time_attacker == 0",
+            "progress_exfiltrateData == 1",
+            "AccesstoExecuteArbitraryCode != 1 & AccesstoMySQL != 1 | DataExfiltration != 0"
+          ],
+          "logic": "AND"
+        },
+        "effects": {
+          "progress_exfiltrateData": 0,
+          "time_attacker": -1,
+          "current_player": 1
+        },
+        "failure_conditions": {
+          "conditions": [
+            "time_attacker != 0",
+            "progress_exfiltrateData != 1"
+          ],
+          "logic": "OR"
+        }
+      },
+      "start_getLoginData": {
+        "preconditions": {
+          "conditions": [
+            "UnencryptedFiles",
+            "AccesstoSensitiveFiles",
+            "time_attacker < 0",
+            "progress_getLoginData == 0"
+          ],
+          "logic": "AND"
+        },
+        "effects": {
+          "progress_getLoginData": 1,
+          "time_attacker": 2,
+          "current_player": 1
+        },
+        "failure_conditions": {
+          "conditions": [
+            "time_attacker >= 0",
+            "progress_getLoginData != 0",
+            "UnencryptedFiles != 1",
+            "AccesstoSensitiveFiles != 1"
+          ],
+          "logic": "OR"
+        }
+      },
+      "end_getLoginData": {
+        "preconditions": {
+          "conditions": [
+            "UnencryptedFiles",
+            "AccesstoSensitiveFiles",
+            "time_attacker == 0",
+            "progress_getLoginData == 1"
+          ],
+          "logic": "AND"
+        },
+        "effects": {
+          "AccesstoMySQL": 1,
+          "progress_getLoginData": 0,
+          "time_attacker": -1,
+          "current_player": 1
+        },
+        "failure_conditions": {
+          "conditions": [
+            "time_attacker != 0",
+            "progress_getLoginData != 1",
+            "UnencryptedFiles != 1",
+            "AccesstoSensitiveFiles != 1"
+          ],
+          "logic": "OR"
+        }
+      },
+      "fail_getLoginData": {
+        "preconditions": {
+          "conditions": [
+            "time_attacker == 0",
+            "progress_getLoginData == 1",
+            "UnencryptedFiles != 1 | AccesstoSensitiveFiles != 1 | AccesstoMySQL != 0"
+          ],
+          "logic": "AND"
+        },
+        "effects": {
+          "progress_getLoginData": 0,
+          "time_attacker": -1,
+          "current_player": 1
+        },
+        "failure_conditions": {
+          "conditions": [
+            "time_attacker != 0",
+            "progress_getLoginData != 1"
+          ],
+          "logic": "OR"
+        }
+      },
+      "start_bufferOverflow": {
+        "preconditions": {
+          "conditions": [
+            "WebReconSuccesful",
+            "SOCKS5ProxyActive",
+            "time_attacker < 0",
+            "progress_bufferOverflow == 0"
+          ],
+          "logic": "AND"
+        },
+        "effects": {
+          "progress_bufferOverflow": 1,
+          "time_attacker": 2,
+          "current_player": 1
+        },
+        "failure_conditions": {
+          "conditions": [
+            "time_attacker >= 0",
+            "progress_bufferOverflow != 0",
+            "WebReconSuccesful != 1",
+            "SOCKS5ProxyActive != 1"
+          ],
+          "logic": "OR"
+        }
+      },
+      "end_bufferOverflow": {
+        "preconditions": {
+          "conditions": [
+            "WebReconSuccesful",
+            "SOCKS5ProxyActive",
+            "time_attacker == 0",
+            "progress_bufferOverflow == 1"
+          ],
+          "logic": "AND"
+        },
+        "effects": {
+          "AccesstoExecuteArbitraryCode": 1,
+          "progress_bufferOverflow": 0,
+          "time_attacker": -1,
+          "current_player": 1
+        },
+        "failure_conditions": {
+          "conditions": [
+            "time_attacker != 0",
+            "progress_bufferOverflow != 1",
+            "WebReconSuccesful != 1",
+            "SOCKS5ProxyActive != 1"
+          ],
+          "logic": "OR"
+        }
+      },
+      "fail_bufferOverflow": {
+        "preconditions": {
+          "conditions": [
+            "time_attacker == 0",
+            "progress_bufferOverflow == 1",
+            "WebReconSuccesful != 1 | SOCKS5ProxyActive != 1 | AccesstoExecuteArbitraryCode != 0"
+          ],
+          "logic": "AND"
+        },
+        "effects": {
+          "progress_bufferOverflow": 0,
+          "time_attacker": -1,
+          "current_player": 1
+        },
+        "failure_conditions": {
+          "conditions": [
+            "time_attacker != 0",
+            "progress_bufferOverflow != 1"
+          ],
+          "logic": "OR"
+        }
+      },
+      "start_getFiles": {
+        "preconditions": {
+          "conditions": [
+            "MisconfiguredApache",
+            "AccesstoReverseShell",
+            "time_attacker < 0",
+            "progress_getFiles == 0"
+          ],
+          "logic": "AND"
+        },
+        "effects": {
+          "progress_getFiles": 1,
+          "time_attacker": 2,
+          "current_player": 1
+        },
+        "failure_conditions": {
+          "conditions": [
+            "time_attacker >= 0",
+            "progress_getFiles != 0",
+            "MisconfiguredApache != 1",
+            "AccesstoReverseShell != 1"
+          ],
+          "logic": "OR"
+        }
+      },
+      "end_getFiles": {
+        "preconditions": {
+          "conditions": [
+            "MisconfiguredApache",
+            "AccesstoReverseShell",
+            "time_attacker == 0",
+            "progress_getFiles == 1"
+          ],
+          "logic": "AND"
+        },
+        "effects": {
+          "AccesstoSensitiveFiles": 1,
+          "progress_getFiles": 0,
+          "time_attacker": -1,
+          "current_player": 1
+        },
+        "failure_conditions": {
+          "conditions": [
+            "time_attacker != 0",
+            "progress_getFiles != 1",
+            "MisconfiguredApache != 1",
+            "AccesstoReverseShell != 1"
+          ],
+          "logic": "OR"
+        }
+      },
+      "fail_getFiles": {
+        "preconditions": {
+          "conditions": [
+            "time_attacker == 0",
+            "progress_getFiles == 1",
+            "MisconfiguredApache != 1 | AccesstoReverseShell != 1 | AccesstoSensitiveFiles != 0"
+          ],
+          "logic": "AND"
+        },
+        "effects": {
+          "progress_getFiles": 0,
+          "time_attacker": -1,
+          "current_player": 1
+        },
+        "failure_conditions": {
+          "conditions": [
+            "time_attacker != 0",
+            "progress_getFiles != 1"
+          ],
+          "logic": "OR"
+        }
+      },
+      "start_webRecon": {
+        "preconditions": {
+          "conditions": [
+            "WebserverPubliclyExposed",
+            "WebserverPubliclyExposed",
+            "time_attacker < 0",
+            "progress_webRecon == 0"
+          ],
+          "logic": "AND"
+        },
+        "effects": {
+          "progress_webRecon": 1,
+          "time_attacker": 1,
+          "current_player": 1
+        },
+        "failure_conditions": {
+          "conditions": [
+            "time_attacker >= 0",
+            "progress_webRecon != 0",
+            "WebserverPubliclyExposed != 1",
+            "WebserverPubliclyExposed != 1"
+          ],
+          "logic": "OR"
+        }
+      },
+      "end_webRecon": {
+        "preconditions": {
+          "conditions": [
+            "WebserverPubliclyExposed",
+            "WebserverPubliclyExposed",
+            "time_attacker == 0",
+            "progress_webRecon == 1"
+          ],
+          "logic": "AND"
+        },
+        "effects": {
+          "WebReconSuccesful": 1,
+          "progress_webRecon": 0,
+          "time_attacker": -1,
+          "current_player": 1
+        },
+        "failure_conditions": {
+          "conditions": [
+            "time_attacker != 0",
+            "progress_webRecon != 1",
+            "WebserverPubliclyExposed != 1",
+            "WebserverPubliclyExposed != 1"
+          ],
+          "logic": "OR"
+        }
+      },
+      "fail_webRecon": {
+        "preconditions": {
+          "conditions": [
+            "time_attacker == 0",
+            "progress_webRecon == 1",
+            "WebserverPubliclyExposed != 1 & WebserverPubliclyExposed != 1 | WebReconSuccesful != 0"
+          ],
+          "logic": "AND"
+        },
+        "effects": {
+          "progress_webRecon": 0,
+          "time_attacker": -1,
+          "current_player": 1
+        },
+        "failure_conditions": {
+          "conditions": [
+            "time_attacker != 0",
+            "progress_webRecon != 1"
+          ],
+          "logic": "OR"
+        }
+      },
+      "start_pathTraversal": {
+        "preconditions": {
+          "conditions": [
+            "WebReconSuccesful",
+            "CGIscriptsenabled",
+            "VulnerableApacheHTTPServerVersion",
+            "time_attacker < 0",
+            "progress_pathTraversal == 0"
+          ],
+          "logic": "AND"
+        },
+        "effects": {
+          "progress_pathTraversal": 1,
+          "time_attacker": 2,
+          "current_player": 1
+        },
+        "failure_conditions": {
+          "conditions": [
+            "time_attacker >= 0",
+            "progress_pathTraversal != 0",
+            "WebReconSuccesful != 1",
+            "CGIscriptsenabled != 1",
+            "VulnerableApacheHTTPServerVersion != 1"
+          ],
+          "logic": "OR"
+        }
+      },
+      "end_pathTraversal": {
+        "preconditions": {
+          "conditions": [
+            "WebReconSuccesful",
+            "CGIscriptsenabled",
+            "VulnerableApacheHTTPServerVersion",
+            "time_attacker == 0",
+            "progress_pathTraversal == 1"
+          ],
+          "logic": "AND"
+        },
+        "effects": {
+          "AccesstoReverseShell": 1,
+          "progress_pathTraversal": 0,
+          "time_attacker": -1,
+          "current_player": 1
+        },
+        "failure_conditions": {
+          "conditions": [
+            "time_attacker != 0",
+            "progress_pathTraversal != 1",
+            "WebReconSuccesful != 1",
+            "CGIscriptsenabled != 1",
+            "VulnerableApacheHTTPServerVersion != 1"
+          ],
+          "logic": "OR"
+        }
+      },
+      "fail_pathTraversal": {
+        "preconditions": {
+          "conditions": [
+            "time_attacker == 0",
+            "progress_pathTraversal == 1",
+            "WebReconSuccesful != 1 | CGIscriptsenabled != 1 | VulnerableApacheHTTPServerVersion != 1 | AccesstoReverseShell != 0"
+          ],
+          "logic": "AND"
+        },
+        "effects": {
+          "progress_pathTraversal": 0,
+          "time_attacker": -1,
+          "current_player": 1
+        },
+        "failure_conditions": {
+          "conditions": [
+            "time_attacker != 0",
+            "progress_pathTraversal != 1"
+          ],
+          "logic": "OR"
+        }
+      },
+      "wait_attacker": {
+        "preconditions": {
+          "conditions": [
+            "time_attacker > 0"
+          ],
+          "logic": "AND"
+        },
+        "effects": {
+          "time_attacker": "time_attacker - 1",
+          "current_player": 1
+        },
+        "failure_conditions": {
+          "conditions": [
+            "time_attacker <= 0"
+          ],
+          "logic": "OR"
+        }
+      }
+    },
+    "defender": {
+      "start_changeCredentials": {
+        "preconditions": {
+          "conditions": [
+            "time_defender < 0",
+            "progress_changeCredentials == 0"
+          ],
+          "logic": "AND"
+        },
+        "effects": {
+          "progress_changeCredentials": 1,
+          "time_defender": 2,
+          "current_player": 0
+        },
+        "failure_conditions": {
+          "conditions": [
+            "time_defender >= 0",
+            "progress_changeCredentials != 0"
+          ],
+          "logic": "OR"
+        }
+      },
+      "end_changeCredentials": {
+        "preconditions": {
+          "conditions": [
+            "time_defender == 0",
+            "progress_changeCredentials == 1"
+          ],
+          "logic": "AND"
+        },
+        "effects": {
+          "AccesstoMySQL": 2,
+          "progress_changeCredentials": 0,
+          "time_defender": -1,
+          "current_player": 0
+        },
+        "failure_conditions": {
+          "conditions": [
+            "time_defender != 0",
+            "progress_changeCredentials != 1"
+          ],
+          "logic": "OR"
+        }
+      },
+      "fail_changeCredentials": {
+        "preconditions": {
+          "conditions": [
+            "time_defender == 0",
+            "progress_changeCredentials == 1"
+          ],
+          "logic": "AND"
+        },
+        "effects": {
+          "progress_changeCredentials": 0,
+          "time_defender": -1,
+          "current_player": 0
+        },
+        "failure_conditions": {
+          "conditions": [
+            "time_defender != 0",
+            "progress_changeCredentials != 1"
+          ],
+          "logic": "OR"
+        }
+      },
+      "start_changeFilePermissions": {
+        "preconditions": {
+          "conditions": [
+            "time_defender < 0",
+            "progress_changeFilePermissions == 0"
+          ],
+          "logic": "AND"
+        },
+        "effects": {
+          "progress_changeFilePermissions": 1,
+          "time_defender": 2,
+          "current_player": 0
+        },
+        "failure_conditions": {
+          "conditions": [
+            "time_defender >= 0",
+            "progress_changeFilePermissions != 0"
+          ],
+          "logic": "OR"
+        }
+      },
+      "end_changeFilePermissions": {
+        "preconditions": {
+          "conditions": [
+            "time_defender == 0",
+            "progress_changeFilePermissions == 1"
+          ],
+          "logic": "AND"
+        },
+        "effects": {
+          "AccesstoSensitiveFiles": 2,
+          "progress_changeFilePermissions": 0,
+          "time_defender": -1,
+          "current_player": 0
+        },
+        "failure_conditions": {
+          "conditions": [
+            "time_defender != 0",
+            "progress_changeFilePermissions != 1"
+          ],
+          "logic": "OR"
+        }
+      },
+      "fail_changeFilePermissions": {
+        "preconditions": {
+          "conditions": [
+            "time_defender == 0",
+            "progress_changeFilePermissions == 1"
+          ],
+          "logic": "AND"
+        },
+        "effects": {
+          "progress_changeFilePermissions": 0,
+          "time_defender": -1,
+          "current_player": 0
+        },
+        "failure_conditions": {
+          "conditions": [
+            "time_defender != 0",
+            "progress_changeFilePermissions != 1"
+          ],
+          "logic": "OR"
+        }
+      },
+      "start_encryptFile": {
+        "preconditions": {
+          "conditions": [
+            "time_defender < 0",
+            "progress_encryptFile == 0"
+          ],
+          "logic": "AND"
+        },
+        "effects": {
+          "progress_encryptFile": 1,
+          "time_defender": 5,
+          "current_player": 0
+        },
+        "failure_conditions": {
+          "conditions": [
+            "time_defender >= 0",
+            "progress_encryptFile != 0"
+          ],
+          "logic": "OR"
+        }
+      },
+      "end_encryptFile": {
+        "preconditions": {
+          "conditions": [
+            "time_defender == 0",
+            "progress_encryptFile == 1"
+          ],
+          "logic": "AND"
+        },
+        "effects": {
+          "UnencryptedFiles": 2,
+          "progress_encryptFile": 0,
+          "time_defender": -1,
+          "current_player": 0
+        },
+        "failure_conditions": {
+          "conditions": [
+            "time_defender != 0",
+            "progress_encryptFile != 1"
+          ],
+          "logic": "OR"
+        }
+      },
+      "fail_encryptFile": {
+        "preconditions": {
+          "conditions": [
+            "time_defender == 0",
+            "progress_encryptFile == 1"
+          ],
+          "logic": "AND"
+        },
+        "effects": {
+          "progress_encryptFile": 0,
+          "time_defender": -1,
+          "current_player": 0
+        },
+        "failure_conditions": {
+          "conditions": [
+            "time_defender != 0",
+            "progress_encryptFile != 1"
+          ],
+          "logic": "OR"
+        }
+      },
+      "start_deactivateSOCKS5Proxy": {
+        "preconditions": {
+          "conditions": [
+            "time_defender < 0",
+            "progress_deactivateSOCKS5Proxy == 0"
+          ],
+          "logic": "AND"
+        },
+        "effects": {
+          "progress_deactivateSOCKS5Proxy": 1,
+          "time_defender": 1,
+          "current_player": 0
+        },
+        "failure_conditions": {
+          "conditions": [
+            "time_defender >= 0",
+            "progress_deactivateSOCKS5Proxy != 0"
+          ],
+          "logic": "OR"
+        }
+      },
+      "end_deactivateSOCKS5Proxy": {
+        "preconditions": {
+          "conditions": [
+            "time_defender == 0",
+            "progress_deactivateSOCKS5Proxy == 1"
+          ],
+          "logic": "AND"
+        },
+        "effects": {
+          "SOCKS5ProxyActive": 2,
+          "progress_deactivateSOCKS5Proxy": 0,
+          "time_defender": -1,
+          "current_player": 0
+        },
+        "failure_conditions": {
+          "conditions": [
+            "time_defender != 0",
+            "progress_deactivateSOCKS5Proxy != 1"
+          ],
+          "logic": "OR"
+        }
+      },
+      "fail_deactivateSOCKS5Proxy": {
+        "preconditions": {
+          "conditions": [
+            "time_defender == 0",
+            "progress_deactivateSOCKS5Proxy == 1"
+          ],
+          "logic": "AND"
+        },
+        "effects": {
+          "progress_deactivateSOCKS5Proxy": 0,
+          "time_defender": -1,
+          "current_player": 0
+        },
+        "failure_conditions": {
+          "conditions": [
+            "time_defender != 0",
+            "progress_deactivateSOCKS5Proxy != 1"
+          ],
+          "logic": "OR"
+        }
+      },
+      "start_reconfigureApache": {
+        "preconditions": {
+          "conditions": [
+            "time_defender < 0",
+            "progress_reconfigureApache == 0"
+          ],
+          "logic": "AND"
+        },
+        "effects": {
+          "progress_reconfigureApache": 1,
+          "time_defender": 2,
+          "current_player": 0
+        },
+        "failure_conditions": {
+          "conditions": [
+            "time_defender >= 0",
+            "progress_reconfigureApache != 0"
+          ],
+          "logic": "OR"
+        }
+      },
+      "end_reconfigureApache": {
+        "preconditions": {
+          "conditions": [
+            "time_defender == 0",
+            "progress_reconfigureApache == 1"
+          ],
+          "logic": "AND"
+        },
+        "effects": {
+          "MisconfiguredApache": 2,
+          "progress_reconfigureApache": 0,
+          "time_defender": -1,
+          "current_player": 0
+        },
+        "failure_conditions": {
+          "conditions": [
+            "time_defender != 0",
+            "progress_reconfigureApache != 1"
+          ],
+          "logic": "OR"
+        }
+      },
+      "fail_reconfigureApache": {
+        "preconditions": {
+          "conditions": [
+            "time_defender == 0",
+            "progress_reconfigureApache == 1"
+          ],
+          "logic": "AND"
+        },
+        "effects": {
+          "progress_reconfigureApache": 0,
+          "time_defender": -1,
+          "current_player": 0
+        },
+        "failure_conditions": {
+          "conditions": [
+            "time_defender != 0",
+            "progress_reconfigureApache != 1"
+          ],
+          "logic": "OR"
+        }
+      },
+      "start_disableCGIScripts": {
+        "preconditions": {
+          "conditions": [
+            "time_defender < 0",
+            "progress_disableCGIScripts == 0"
+          ],
+          "logic": "AND"
+        },
+        "effects": {
+          "progress_disableCGIScripts": 1,
+          "time_defender": 1,
+          "current_player": 0
+        },
+        "failure_conditions": {
+          "conditions": [
+            "time_defender >= 0",
+            "progress_disableCGIScripts != 0"
+          ],
+          "logic": "OR"
+        }
+      },
+      "end_disableCGIScripts": {
+        "preconditions": {
+          "conditions": [
+            "time_defender == 0",
+            "progress_disableCGIScripts == 1"
+          ],
+          "logic": "AND"
+        },
+        "effects": {
+          "CGIscriptsenabled": 2,
+          "progress_disableCGIScripts": 0,
+          "time_defender": -1,
+          "current_player": 0
+        },
+        "failure_conditions": {
+          "conditions": [
+            "time_defender != 0",
+            "progress_disableCGIScripts != 1"
+          ],
+          "logic": "OR"
+        }
+      },
+      "fail_disableCGIScripts": {
+        "preconditions": {
+          "conditions": [
+            "time_defender == 0",
+            "progress_disableCGIScripts == 1"
+          ],
+          "logic": "AND"
+        },
+        "effects": {
+          "progress_disableCGIScripts": 0,
+          "time_defender": -1,
+          "current_player": 0
+        },
+        "failure_conditions": {
+          "conditions": [
+            "time_defender != 0",
+            "progress_disableCGIScripts != 1"
+          ],
+          "logic": "OR"
+        }
+      },
+      "start_updateApache": {
+        "preconditions": {
+          "conditions": [
+            "time_defender < 0",
+            "progress_updateApache == 0"
+          ],
+          "logic": "AND"
+        },
+        "effects": {
+          "progress_updateApache": 1,
+          "time_defender": 20,
+          "current_player": 0
+        },
+        "failure_conditions": {
+          "conditions": [
+            "time_defender >= 0",
+            "progress_updateApache != 0"
+          ],
+          "logic": "OR"
+        }
+      },
+      "end_updateApache": {
+        "preconditions": {
+          "conditions": [
+            "time_defender == 0",
+            "progress_updateApache == 1"
+          ],
+          "logic": "AND"
+        },
+        "effects": {
+          "VulnerableApacheHTTPServerVersion": 2,
+          "progress_updateApache": 0,
+          "time_defender": -1,
+          "current_player": 0
+        },
+        "failure_conditions": {
+          "conditions": [
+            "time_defender != 0",
+            "progress_updateApache != 1"
+          ],
+          "logic": "OR"
+        }
+      },
+      "fail_updateApache": {
+        "preconditions": {
+          "conditions": [
+            "time_defender == 0",
+            "progress_updateApache == 1"
+          ],
+          "logic": "AND"
+        },
+        "effects": {
+          "progress_updateApache": 0,
+          "time_defender": -1,
+          "current_player": 0
+        },
+        "failure_conditions": {
+          "conditions": [
+            "time_defender != 0",
+            "progress_updateApache != 1"
+          ],
+          "logic": "OR"
+        }
+      },
+      "wait_defender": {
+        "preconditions": {
+          "conditions": [
+            "time_defender > 0"
+          ],
+          "logic": "AND"
+        },
+        "effects": {
+          "time_defender": "time_defender - 1",
+          "current_player": 0
+        },
+        "failure_conditions": {
+          "conditions": [
+            "time_defender <= 0"
+          ],
+          "logic": "OR"
+        }
+      }
+    }
+  },
+  "rewards": {
+    "attacker": {
+      "start_exfiltrateData": -50,
+      "end_exfiltrateData": 0,
+      "fail_exfiltrateData": 0,
+      "start_getLoginData": -10,
+      "end_getLoginData": 0,
+      "fail_getLoginData": 0,
+      "start_bufferOverflow": -40,
+      "end_bufferOverflow": 0,
+      "fail_bufferOverflow": 0,
+      "start_getFiles": -30,
+      "end_getFiles": 0,
+      "fail_getFiles": 0,
+      "start_webRecon": -5,
+      "end_webRecon": 0,
+      "fail_webRecon": 0,
+      "start_pathTraversal": -20,
+      "end_pathTraversal": 0,
+      "fail_pathTraversal": 0,
+      "wait_attacker": 0
+    },
+    "defender": {
+      "start_changeCredentials": -200,
+      "end_changeCredentials": 0,
+      "fail_changeCredentials": 0,
+      "start_changeFilePermissions": -60,
+      "end_changeFilePermissions": 0,
+      "fail_changeFilePermissions": 0,
+      "start_encryptFile": -150,
+      "end_encryptFile": 0,
+      "fail_encryptFile": 0,
+      "start_deactivateSOCKS5Proxy": -120,
+      "end_deactivateSOCKS5Proxy": 0,
+      "fail_deactivateSOCKS5Proxy": 0,
+      "start_reconfigureApache": -50,
+      "end_reconfigureApache": 0,
+      "fail_reconfigureApache": 0,
+      "start_disableCGIScripts": -45,
+      "end_disableCGIScripts": 0,
+      "fail_disableCGIScripts": 0,
+      "start_updateApache": -20,
+      "end_updateApache": 0,
+      "fail_updateApache": 0,
+      "wait_defender": 0
+    },
+    "terminal_rewards": {
+      "end_exfiltrateData": -500
+    }
+  },
+  "initial_state": {
+    "DataExfiltration": 0,
+    "current_player": 0,
+    "AccesstoExecuteArbitraryCode": 0,
+    "AccesstoMySQL": 0,
+    "WebReconSuccesful": 0,
+    "AccesstoSensitiveFiles": 0,
+    "AccesstoReverseShell": 0,
+    "UnencryptedFiles": 1,
+    "SOCKS5ProxyActive": 1,
+    "MisconfiguredApache": 1,
+    "WebserverPubliclyExposed": 1,
+    "CGIscriptsenabled": 1,
+    "VulnerableApacheHTTPServerVersion": 1,
+    "progress_exfiltrateData": 0,
+    "progress_getLoginData": 0,
+    "progress_bufferOverflow": 0,
+    "progress_getFiles": 0,
+    "progress_webRecon": 0,
+    "progress_pathTraversal": 0,
+    "progress_changeCredentials": 0,
+    "progress_changeFilePermissions": 0,
+    "progress_encryptFile": 0,
+    "progress_deactivateSOCKS5Proxy": 0,
+    "progress_reconfigureApache": 0,
+    "progress_disableCGIScripts": 0,
+    "progress_updateApache": 0,
+    "time_attacker": -1,
+    "time_defender": -1
+  },
+  "terminal_states": [
+    {
+      "condition": "DataExfiltration == 1",
+      "description": "Goal achieved by attacker"
+    }
+  ]
+}

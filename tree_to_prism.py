@@ -1,3 +1,5 @@
+import argparse
+import os
 import xml.etree.ElementTree as ET
 from tree import Node, Tree
 
@@ -395,3 +397,34 @@ def save_prism_properties(file):
         f.write('<<attacker,defender>>R{"attacker"}min=? [ F "terminate" ] + R{"defender"}min=? [ F "deadlock" ]\n')
         f.close()
     
+def main():
+    parser = argparse.ArgumentParser(description='Process XML file from ADTool and generate PRISM model')
+    parser.add_argument('--input', '-i', type=str, help='Path to the XML file from ADTool', required=True)
+    parser.add_argument('--output', '-o', type=str, help='Path to the output file for the PRISM model')
+    parser.add_argument('--props', action='store_true', help='Generate the properties file')
+    parser.add_argument('--prune', '-p', type=str, help='Name of the subtree root to keep')
+    parser.add_argument('--time', '-t', action='store_true', help='Generate a time-based PRISM model')
+    args = parser.parse_args()
+
+    tree = parse_file(args.input)
+    if args.prune:
+        tree = tree.prune(args.prune)
+    if args.time:
+        prism_model = get_prism_model_time(tree)
+    else:
+        prism_model = get_prism_model(tree)
+    if args.output:
+        file = args.output
+    else:
+        # Use the same folder as the input file but with .prism extension
+        input_base = os.path.splitext(args.input)[0]
+        file = input_base + ".prism"
+    save_prism_model(prism_model, file)
+    if args.props:
+        # save the properties file in the same directory as the output file
+        path_output = "/".join(file.split("/")[:-1])
+        save_prism_properties(os.path.join(path_output, "properties.props"))
+
+
+if __name__ == '__main__':
+    main()
