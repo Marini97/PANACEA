@@ -101,10 +101,10 @@ class AttackDefenseTreeEnv(gym.Env):
         """Check if action preconditions are satisfied."""
         # Check if action can be performed based on the current state
         effect = action_spec.get("effect", None)
+        current_player = "attacker" if self.state["current_player"] == 0 else "defender"
         if effect and effect in self.state:
-            current_player = "attacker" if self.state["current_player"] == 0 else "defender"
             if current_player == "attacker" and self.state[effect] != 0:
-                # Can't attack a node that's already compromised
+                # Can't attack a node that's already compromised or protected
                 return False
             elif current_player == "defender" and self.state[effect] == 2:
                 # Can't defend a node that's already protected
@@ -134,7 +134,18 @@ class AttackDefenseTreeEnv(gym.Env):
         """Apply action effects and return rewards."""
         rewards = {"attacker": 0, "defender": 0}
         
-        # Get action effects from transitions
+        # Apply primary action effect
+        if "effect" in action_spec and action_spec["effect"]:
+            effect_var = action_spec["effect"]
+            if effect_var in self.state:
+                if player == "attacker":
+                    # Attacker sets to 1 (compromised)
+                    self.state[effect_var] = 1
+                else:
+                    # Defender sets to 2 (protected)
+                    self.state[effect_var] = 2
+        
+        # Get additional action effects from transitions
         if player == "attacker" and action_spec["name"] in self.env_spec["transitions"]["attacker"]:
             effects = self.env_spec["transitions"]["attacker"][action_spec["name"]]["effects"]
         elif player == "defender" and action_spec["name"] in self.env_spec["transitions"]["defender"]:
@@ -142,7 +153,7 @@ class AttackDefenseTreeEnv(gym.Env):
         else:
             effects = {}
         
-        # Apply state changes
+        # Apply additional state changes from transitions
         for var, value in effects.items():
             if var in self.state:
                 self.state[var] = value
@@ -157,7 +168,7 @@ class AttackDefenseTreeEnv(gym.Env):
         
         # Terminal rewards
         if action_spec["name"] in self.env_spec["rewards"]["terminal_rewards"]:
-            rewards[player] += self.env_spec["rewards"]["terminal_rewards"][action_spec["name"]]
+            rewards["defender"] += self.env_spec["rewards"]["terminal_rewards"][action_spec["name"]]
         
         return rewards
     
@@ -176,8 +187,14 @@ class AttackDefenseTreeEnv(gym.Env):
         """Reset the environment to initial state."""
         super().reset(seed=seed)
         
-        # Initialize state from JSON specification
-        self.state = self.env_spec["initial_state"].copy()
+        # Initialize all state variables to their minimum values
+        self.state = {}
+        for var, spec in self.env_spec["state_space"].items():
+            self.state[var] = spec["low"]
+        
+        # Override with specific initial values from JSON
+        for var, value in self.env_spec["initial_state"].items():
+            self.state[var] = value
         
         info = {
             "current_player": "attacker" if self.state["current_player"] == 0 else "defender",
@@ -187,9 +204,13 @@ class AttackDefenseTreeEnv(gym.Env):
         
         return self._get_state_vector(), info
     
-    def step(self, action: int) -> Tuple[np.ndarray, float, bool, bool, Dict]:
+    def step(self, action: int) -> Tuple[np.ndarray, Dict, bool, bool, Dict]:
         """Execute one step in the environment."""
         current_player = "attacker" if self.state["current_player"] == 0 else "defender"
+        
+        # Check if current player has any available actions (excluding wait)
+        available_actions = self.get_available_actions()
+        no_actions_available = len(available_actions) == 0
         
         # Get action specification
         if current_player == "attacker":
@@ -204,28 +225,35 @@ class AttackDefenseTreeEnv(gym.Env):
         # Check if action is valid (preconditions satisfied)
         valid_action = self._check_preconditions(action_spec)
         
-        reward = 0
-        if valid_action and action_spec["name"] != "wait":
+        winner = None
+        rewards = {"attacker": 0, "defender": 0}
+        
+        if no_actions_available:
+            # Current player has no valid actions - other player wins
+            winner = "defender" if current_player == "attacker" else "attacker"
+        elif valid_action and action_spec["name"] != "wait":
             # Apply action effects
             rewards = self._apply_effects(action_spec, current_player)
-            reward = rewards.get(current_player, 0)
         else:
             # Invalid action or wait - just switch turns
             next_player = 1 if current_player == "attacker" else 0
             self.state["current_player"] = next_player
         
         # Check if terminal state reached
-        terminated = self._is_terminal()
+        terminated = self._is_terminal() or no_actions_available
+
         truncated = False  # Could add step limits here
         
         info = {
-            "current_player": "attacker" if self.state["current_player"] == 0 else "defender",
+            "current_player": current_player,
             "action_taken": action_spec["name"],
             "action_valid": valid_action,
-            "terminal": terminated
+            "terminal": terminated,
+            "winner": winner,
+            "termination_reason": "no_actions" if no_actions_available else ("goal_achieved" if terminated else None),
         }
         
-        return self._get_state_vector(), reward, terminated, truncated, info
+        return self._get_state_vector(), rewards, terminated, truncated, info
     
     def render(self):
         """Render the current state (simple text output)."""
@@ -249,9 +277,10 @@ class AttackDefenseTreeEnv(gym.Env):
             actions = self.attacker_actions
         else:
             actions = self.defender_actions
-        print(f"Available actions for {current_player}: {actions}")
+        # print(f"Available actions for {current_player}: {actions}")
         for action_id, action_spec in actions.items():
-            if self._check_preconditions(action_spec):
+            # Exclude wait actions when checking for meaningful available actions
+            if action_spec["name"] != "wait" and self._check_preconditions(action_spec):
                 available.append(int(action_id))
         
         return available

@@ -15,7 +15,7 @@ def demo_environment():
     print("=== Attack-Defense Tree Environment Demo ===")
     
     # Load environment
-    env = AttackDefenseTreeEnv("gym/envs/adt_nuovo_env.json", render_mode="human")
+    env = AttackDefenseTreeEnv("envs/adt_nuovo_env.json", render_mode="human")
 
     print(f"Environment loaded successfully!")
     print(f"State space: {env.observation_space}")
@@ -41,12 +41,15 @@ def demo_environment():
             # Choose random available action
             action = np.random.choice(available_actions)
         else:
-            # Choose wait action (last action in list)
+            # No valid actions available - game will terminate
+            print("🚫 No valid actions available - player is blocked!")
             current_player = "attacker" if env.state["current_player"] == 0 else "defender"
+            print(f"{current_player.upper()} has no moves and will lose!")
+            # Use any action - the step function will handle termination
             if current_player == "attacker":
-                action = env.num_attacker_actions - 1
+                action = 0  # Use first action, will be handled as invalid
             else:
-                action = env.num_defender_actions - 1
+                action = 0
         
         # Execute action
         obs, reward, terminated, truncated, info = env.step(action)
@@ -55,6 +58,22 @@ def demo_environment():
         print(f"Valid action: {info['action_valid']}")
         print(f"Reward: {reward}")
         print(f"Terminated: {terminated}")
+        
+        if terminated:
+            print(f"\n🎮 GAME OVER!")
+            if info.get('winner'):
+                winner = info['winner'].upper()
+                reason = info.get('termination_reason', 'unknown')
+                if reason == 'no_actions':
+                    print(f"🏆 {winner} WINS! Opponent was completely blocked.")
+                elif reason == 'goal_achieved':
+                    print(f"🎯 {winner} WINS! Goal achieved.")
+                else:
+                    print(f"🏆 {winner} WINS!")
+            elif env.state[env.goal] == 1:
+                print("🎯 ATTACKER WINS! Goal achieved!")
+            else:
+                print("🛡️  DEFENDER WINS! Attack prevented!")
         
         env.render()
         
@@ -72,7 +91,7 @@ def interactive_environment():
     print("=== Interactive Attack-Defense Tree Environment ===")
     
     # Load environment
-    env = AttackDefenseTreeEnv("gym/envs/adt_nuovo_env.json", render_mode="human")
+    env = AttackDefenseTreeEnv("envs/adt_nuovo_env.json", render_mode="human")
 
     print(f"Environment loaded successfully!")
     print(f"State space: {env.observation_space}")
@@ -109,8 +128,9 @@ def interactive_environment():
         
         print(f"\nAvailable actions for {current_player}:")
         if not available_actions:
-            print("  No valid actions available - will use wait action")
-            action = len(actions) - 1
+            print("  🚫 No valid actions available - game should terminate!")
+            print(f"  {current_player.upper()} is blocked and loses!")
+            break
         else:
             for action_id in available_actions:
                 action_spec = actions[str(action_id)]

@@ -3,5 +3,6 @@
         "activityBar.background": "#023431",
         "titleBar.activeBackground": "#024944",
         "titleBar.activeForeground": "#E9FEFD"
-    }
+    },
+    "python.analysis.autoImportCompletions": true
 }

@@ -133,7 +133,11 @@ def get_info(df):
                 "time" : time,
                 "refinement" : refinement}
         elif action in attacker_actions.keys():
-            attacker_actions[action]["preconditions"] += preconditions
+            # Add preconditions but avoid duplicates by converting to set and back to list
+            existing_preconditions = set(attacker_actions[action]["preconditions"])
+            new_preconditions = [p for p in preconditions if p not in df_defender["Label"].values]
+            combined_preconditions = list(existing_preconditions.union(set(new_preconditions)))
+            attacker_actions[action]["preconditions"] = combined_preconditions
         elif row["Role"] == "Defender" and action not in defender_actions:
                 defender_actions[action] = {
                     "preconditions" : preconditions, 
@@ -141,6 +145,11 @@ def get_info(df):
                     "cost" : cost,
                     "time" : time,
                     "refinement" : refinement}
+        elif action in defender_actions.keys():
+            # Add preconditions but avoid duplicates by converting to set and back to list
+            existing_preconditions = set(defender_actions[action]["preconditions"])
+            combined_preconditions = list(existing_preconditions.union(set(preconditions)))
+            defender_actions[action]["preconditions"] = combined_preconditions
                 
     return goal, actions_to_goal, initial_attributes, attacker_actions, defender_actions, df_attacker, df_defender
 

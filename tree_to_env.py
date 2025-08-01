@@ -7,6 +7,339 @@ from tree import Tree
 from tree_to_prism import parse_file, get_info
 
 
+def get_gym_environment(tree):
+    """
+    Converts a tree object into a Gymnasium environment specification.
+    
+    Args:
+        tree: The tree object to be converted.
+        
+    Returns:
+        dict: A dictionary containing the complete Gymnasium environment specification.
+    """
+    df = tree.to_dataframe()
+    goal, actions_to_goal, initial_attributes, attacker_actions, defender_actions, df_attacker, df_defender = get_info(df)
+    
+    # Initialize environment specification
+    env_spec = {
+        "metadata": {
+            "goal": goal,
+            "actions_to_goal": list(actions_to_goal),
+            "initial_attributes": initial_attributes,
+            "environment_type": "attack_defense_tree",
+            "time_based": False
+        },
+        "state_space": {},
+        "action_space": {},
+        "transitions": {},
+        "rewards": {},
+        "initial_state": {},
+        "terminal_states": []
+    }
+    
+    # Build environment components
+    _define_state_space(env_spec, goal, df_attacker, df_defender, initial_attributes)
+    _define_action_space(env_spec, attacker_actions, defender_actions, time_based=False)
+    _define_initial_state(env_spec, goal, initial_attributes)
+    _define_transitions(env_spec, attacker_actions, defender_actions, time_based=False)
+    _define_rewards(env_spec, attacker_actions, defender_actions, actions_to_goal)
+    _define_terminal_states(env_spec, goal)
+    
+    return env_spec
+
+
+def get_gym_environment_time(tree):
+    """
+    Converts a tree object into a time-based Gymnasium environment specification.
+    
+    Args:
+        tree: The tree object to be converted.
+        
+    Returns:
+        dict: A dictionary containing the complete time-based Gymnasium environment specification.
+    """
+    df = tree.to_dataframe()
+    goal, actions_to_goal, initial_attributes, attacker_actions, defender_actions, df_attacker, df_defender = get_info(df)
+    
+    # Initialize environment specification
+    env_spec = {
+        "metadata": {
+            "goal": goal,
+            "actions_to_goal": list(actions_to_goal),
+            "initial_attributes": initial_attributes,
+            "environment_type": "attack_defense_tree",
+            "time_based": True
+        },
+        "state_space": {},
+        "action_space": {},
+        "transitions": {},
+        "rewards": {},
+        "initial_state": {},
+        "terminal_states": []
+    }
+    
+    # Build environment components
+    _define_state_space(env_spec, goal, df_attacker, df_defender, initial_attributes, time_based=True)
+    _define_action_space(env_spec, attacker_actions, defender_actions, time_based=True)
+    _define_initial_state(env_spec, goal, initial_attributes, time_based=True)
+    _define_transitions(env_spec, attacker_actions, defender_actions, time_based=True)
+    _define_rewards(env_spec, attacker_actions, defender_actions, actions_to_goal)
+    _define_terminal_states(env_spec, goal)
+    
+    return env_spec
+
+
+# Helper functions for building environment components
+
+def _define_state_space(env_spec, goal, df_attacker, df_defender, initial_attributes, time_based=False):
+    """Define the state space for the environment."""
+    # Goal state
+    env_spec["state_space"][goal] = {
+        "type": "discrete",
+        "low": 0,
+        "high": 1,
+        "description": "Goal achievement state"
+    }
+    
+    # Current player turn
+    env_spec["state_space"]["current_player"] = {
+        "type": "discrete", 
+        "low": 0,
+        "high": 1,
+        "description": "Current player (0=attacker, 1=defender)"
+    }
+    
+    # Attacker attributes (can be 0=not achieved, 1=achieved, 2=defended)
+    for attr in set(df_attacker.loc[df_attacker["Type"] == "Attribute"]["Label"].values):
+        env_spec["state_space"][attr] = {
+            "type": "discrete",
+            "low": 0,
+            "high": 2,
+            "description": f"Attacker attribute: {attr}"
+        }
+    
+    # Initial system attributes (start as 1=vulnerable, can be 2=protected)
+    for attr in initial_attributes:
+        env_spec["state_space"][attr] = {
+            "type": "discrete",
+            "low": 1,
+            "high": 2,
+            "description": f"Initial system attribute: {attr}"
+        }
+    
+    # Defender attributes
+    defender_attributes = set(df_defender.loc[df_defender["Type"] == "Attribute"]["Label"].values)
+    for attr in defender_attributes:
+        env_spec["state_space"][attr] = {
+            "type": "discrete",
+            "low": 0,
+            "high": 1,
+            "description": f"Defender attribute: {attr}"
+        }
+    
+    # Time-based state variables
+    if time_based:
+        env_spec["state_space"]["time_attacker"] = {
+            "type": "discrete",
+            "low": -1,
+            "high": max(df_attacker["Time"].values) if not df_attacker.empty else 0,
+            "description": "Attacker time counter"
+        }
+        env_spec["state_space"]["time_defender"] = {
+            "type": "discrete", 
+            "low": -1,
+            "high": max(df_defender["Time"].values) if not df_defender.empty else 0,
+            "description": "Defender time counter"
+        }
+        
+        # Progress tracking for each action
+        for action_name in set(df_attacker["Action"].values):
+            if action_name:  # Skip empty actions
+                env_spec["state_space"][f"progress_{action_name}"] = {
+                    "type": "discrete",
+                    "low": 0,
+                    "high": 1,
+                    "description": f"Progress tracker for attacker action: {action_name}"
+                }
+                
+        for action_name in set(df_defender["Action"].values):
+            if action_name:  # Skip empty actions
+                env_spec["state_space"][f"progress_{action_name}"] = {
+                    "type": "discrete",
+                    "low": 0,
+                    "high": 1,
+                    "description": f"Progress tracker for defender action: {action_name}"
+                }
+
+
+def _define_action_space(env_spec, attacker_actions, defender_actions, time_based=False):
+    """Define available actions for both players."""
+    env_spec["action_space"]["attacker"] = {
+        "type": "discrete",
+        "actions": {}
+    }
+    
+    env_spec["action_space"]["defender"] = {
+        "type": "discrete", 
+        "actions": {}
+    }
+    
+    if time_based:
+        _define_time_based_action_space(env_spec, attacker_actions, defender_actions)
+    else:
+        _define_standard_action_space(env_spec, attacker_actions, defender_actions)
+
+
+def _define_standard_action_space(env_spec, attacker_actions, defender_actions):
+    """Define action space for non-time-based environment."""
+    # Add attacker actions
+    action_id = 0
+    for action_name, action_data in attacker_actions.items():
+        cost = int(action_data["cost"]) if action_data["cost"] else 0
+        
+        # Build conditions list - only include the original preconditions
+        conditions = action_data["preconditions"].copy()
+        
+        # Determine logic based on refinement type
+        logic = "OR" if action_data["refinement"] == "disjunctive" else "AND"
+        
+        env_spec["action_space"]["attacker"]["actions"][action_id] = {
+            "name": action_name,
+            "preconditions": {
+                "conditions": conditions,
+                "logic": logic,
+                "required_values": {cond: 1 for cond in action_data["preconditions"]}
+            },
+            "effect": action_data["effect"],
+            "cost": cost,
+            "refinement": action_data["refinement"]
+        }
+        action_id += 1
+    
+    # Add defender actions
+    action_id = 0
+    for action_name, action_data in defender_actions.items():
+        cost = int(action_data["cost"]) if action_data["cost"] else 0
+        
+        # Build conditions list - only include the original preconditions
+        conditions = action_data["preconditions"].copy()
+        
+        # Determine logic based on refinement type
+        logic = "OR" if action_data["refinement"] == "disjunctive" else "AND"
+        
+        env_spec["action_space"]["defender"]["actions"][action_id] = {
+            "name": action_name,
+            "preconditions": {
+                "conditions": conditions,
+                "logic": logic,
+                "required_values": {cond: 1 for cond in action_data["preconditions"]}
+            },
+            "effect": action_data["effect"],
+            "cost": cost,
+            "refinement": action_data["refinement"]
+        }
+        action_id += 1
+
+
+def _define_time_based_action_space(env_spec, attacker_actions, defender_actions):
+    """Define action space for time-based environment."""
+    # Note: Time-based actions are more complex and follow PRISM model patterns
+    # This is a simplified version - full implementation would include start/end/fail actions
+    _define_standard_action_space(env_spec, attacker_actions, defender_actions)
+
+
+def _define_initial_state(env_spec, goal, initial_attributes, time_based=False):
+    """Define the initial state of the environment."""
+    env_spec["initial_state"] = {
+        goal: 0,  # Goal not achieved initially
+        "current_player": 0  # Attacker starts first
+    }
+    
+    # Set initial attributes to vulnerable (1)
+    for attr in initial_attributes:
+        env_spec["initial_state"][attr] = 1
+    
+    if time_based:
+        env_spec["initial_state"]["time_attacker"] = -1  # Can act immediately
+        env_spec["initial_state"]["time_defender"] = -1  # Can act immediately
+
+
+def _define_transitions(env_spec, attacker_actions, defender_actions, time_based=False):
+    """Define state transitions for the environment."""
+    env_spec["transitions"] = {
+        "attacker": {},
+        "defender": {}
+    }
+    
+    if time_based:
+        # For time-based environments, transitions are more complex
+        # This would need to be implemented based on PRISM logic
+        pass
+    else:
+        # For standard environments, define transitions for each action
+        # Attacker actions
+        for action_name, action_data in attacker_actions.items():
+            env_spec["transitions"]["attacker"][action_name] = {
+                "effects": {
+                    action_data["effect"]: 1,  # Achieve the effect
+                    "current_player": 1  # Switch to defender
+                }
+            }
+        
+        # Defender actions  
+        for action_name, action_data in defender_actions.items():
+            effect = action_data["effect"]
+            # Defender actions should set effects to 2 to indicate protection/deactivation
+            # This applies to both initial system attributes and attacker-generated attributes
+            env_spec["transitions"]["defender"][action_name] = {
+                "effects": {
+                    effect: 2,  # Always set to 2 for defender protection
+                    "current_player": 0  # Switch to attacker
+                }
+            }
+
+
+def _define_rewards(env_spec, attacker_actions, defender_actions, actions_to_goal):
+    """Define reward structure."""
+    env_spec["rewards"] = {
+        "attacker": {},
+        "defender": {},
+        "cost_penalty": 10,   # General cost penalty multiplier
+        "terminal_rewards": {}  # Terminal state rewards
+    }
+    
+    # Action costs as negative rewards
+    for action_name, action_data in attacker_actions.items():
+        cost = int(action_data["cost"]) if action_data["cost"] else 0
+        env_spec["rewards"]["attacker"][action_name] = -cost
+    
+    for action_name, action_data in defender_actions.items():
+        cost = int(action_data["cost"]) if action_data["cost"] else 0
+        env_spec["rewards"]["defender"][action_name] = -cost
+    
+    # Terminal state penalties for actions that lead to goal
+    for action in actions_to_goal:
+        if action in attacker_actions:
+            cost = int(attacker_actions[action]["cost"]) if attacker_actions[action]["cost"] else 0
+            env_spec["rewards"]["terminal_rewards"][action] = -cost * env_spec["rewards"]["cost_penalty"]
+
+
+def _define_terminal_states(env_spec, goal):
+    """Define terminal conditions."""
+    env_spec["terminal_states"] = [
+        {
+            "condition": f"{goal} == 1",
+            "description": "Goal achieved by attacker"
+        }
+    ]
+
+
+def save_gym_environment(env_spec, file):
+    """Save the environment specification to a JSON file."""
+    with open(file, 'w') as f:
+        json.dump(env_spec, f, indent=2)
+
+
 class TreeToGymEnvironment:
     """
     Converts a tree object into a Gymnasium environment specification.
@@ -836,8 +1169,11 @@ def convert_tree_to_gym_env(xml_file: str, output_file: Optional[str] = None, ti
     # Parse the XML file
     tree = parse_file(xml_file)
     
-    # Create environment converter
-    env_converter = TreeToGymEnvironment(tree, time_based)
+    # Generate environment specification using new function-based approach
+    if time_based:
+        env_spec = get_gym_environment_time(tree)
+    else:
+        env_spec = get_gym_environment(tree)
     
     # Generate output filename if not provided
     if output_file is None:
@@ -845,9 +1181,10 @@ def convert_tree_to_gym_env(xml_file: str, output_file: Optional[str] = None, ti
         output_file = xml_file.replace('.xml', suffix)
     
     # Save environment
-    env_converter.save_environment(output_file)
+    save_gym_environment(env_spec, output_file)
+    print(f"Environment saved to {output_file}")
     
-    return env_converter.get_environment_spec()
+    return env_spec
 
 
 def load_environment_spec(json_file: str) -> Dict:
@@ -891,19 +1228,21 @@ if __name__ == "__main__":
     print(f"Output will be saved to: {args.output}")
     
     try:
-        # Parse the XML file
+        # Parse the XML file and apply pruning if requested
         tree = parse_file(args.input)
-        
-        # Apply pruning if requested
         if args.prune:
             print(f"Pruning tree to keep subtree rooted at: {args.prune}")
             tree = tree.prune(args.prune)
         
-        # Create environment converter
-        env_converter = TreeToGymEnvironment(tree, args.time)
+        # Generate environment specification using new function-based approach
+        if args.time:
+            env_spec = get_gym_environment_time(tree)
+        else:
+            env_spec = get_gym_environment(tree)
         
         # Save environment
-        env_converter.save_environment(args.output)
+        save_gym_environment(env_spec, args.output)
+        print(f"Environment saved to {args.output}")
     
     except FileNotFoundError:
         print(f"Error: Input file '{args.input}' not found.")

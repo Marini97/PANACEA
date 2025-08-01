@@ -41,6 +41,12 @@
       "high": 2,
       "description": "Attacker attribute: AccesstoReverseShell"
     },
+    "AccesstoExecuteArbitraryCode": {
+      "type": "discrete",
+      "low": 0,
+      "high": 2,
+      "description": "Attacker attribute: AccesstoExecuteArbitraryCode"
+    },
     "AccesstoMySQL": {
       "type": "discrete",
       "low": 0,
@@ -52,12 +58,6 @@
       "low": 0,
       "high": 2,
       "description": "Attacker attribute: WebReconSuccesful"
-    },
-    "AccesstoExecuteArbitraryCode": {
-      "type": "discrete",
-      "low": 0,
-      "high": 2,
-      "description": "Attacker attribute: AccesstoExecuteArbitraryCode"
     },
     "UnencryptedFiles": {
       "type": "discrete",
@@ -121,13 +121,13 @@
           "name": "getLoginData",
           "preconditions": {
             "conditions": [
-              "UnencryptedFiles",
-              "AccesstoSensitiveFiles"
+              "AccesstoSensitiveFiles",
+              "UnencryptedFiles"
             ],
             "logic": "AND",
             "required_values": {
-              "UnencryptedFiles": 1,
-              "AccesstoSensitiveFiles": 1
+              "AccesstoSensitiveFiles": 1,
+              "UnencryptedFiles": 1
             }
           },
           "effect": "AccesstoMySQL",
@@ -172,7 +172,6 @@
           "name": "webRecon",
           "preconditions": {
             "conditions": [
-              "WebserverPubliclyExposed",
               "WebserverPubliclyExposed"
             ],
             "logic": "OR",
@@ -189,14 +188,14 @@
           "preconditions": {
             "conditions": [
               "CGIscriptsenabled",
-              "WebReconSuccesful",
-              "VulnerableApacheHTTPServerVersion"
+              "VulnerableApacheHTTPServerVersion",
+              "WebReconSuccesful"
             ],
             "logic": "AND",
             "required_values": {
               "CGIscriptsenabled": 1,
-              "WebReconSuccesful": 1,
-              "VulnerableApacheHTTPServerVersion": 1
+              "VulnerableApacheHTTPServerVersion": 1,
+              "WebReconSuccesful": 1
             }
           },
           "effect": "AccesstoReverseShell",
@@ -234,7 +233,7 @@
           "name": "encryptFile",
           "preconditions": {
             "conditions": [],
-            "logic": "AND",
+            "logic": "OR",
             "required_values": {}
           },
           "effect": "UnencryptedFiles",
@@ -291,103 +290,36 @@
   "transitions": {
     "attacker": {
       "exfiltrateData": {
-        "preconditions": {
-          "conditions": [
-            "AccesstoMySQL",
-            "AccesstoExecuteArbitraryCode"
-          ],
-          "logic": "OR",
-          "required_values": {
-            "AccesstoMySQL": 1,
-            "AccesstoExecuteArbitraryCode": 1
-          }
-        },
         "effects": {
           "DataExfiltration": 1,
           "current_player": 1
         }
       },
       "getLoginData": {
-        "preconditions": {
-          "conditions": [
-            "UnencryptedFiles",
-            "AccesstoSensitiveFiles"
-          ],
-          "logic": "AND",
-          "required_values": {
-            "UnencryptedFiles": 1,
-            "AccesstoSensitiveFiles": 1
-          }
-        },
         "effects": {
           "AccesstoMySQL": 1,
           "current_player": 1
         }
       },
       "bufferOverflow": {
-        "preconditions": {
-          "conditions": [
-            "SOCKS5ProxyActive",
-            "WebReconSuccesful"
-          ],
-          "logic": "AND",
-          "required_values": {
-            "SOCKS5ProxyActive": 1,
-            "WebReconSuccesful": 1
-          }
-        },
         "effects": {
           "AccesstoExecuteArbitraryCode": 1,
           "current_player": 1
         }
       },
       "getFiles": {
-        "preconditions": {
-          "conditions": [
-            "MisconfiguredApache",
-            "AccesstoReverseShell"
-          ],
-          "logic": "AND",
-          "required_values": {
-            "MisconfiguredApache": 1,
-            "AccesstoReverseShell": 1
-          }
-        },
         "effects": {
           "AccesstoSensitiveFiles": 1,
           "current_player": 1
         }
       },
       "webRecon": {
-        "preconditions": {
-          "conditions": [
-            "WebserverPubliclyExposed",
-            "WebserverPubliclyExposed"
-          ],
-          "logic": "OR",
-          "required_values": {
-            "WebserverPubliclyExposed": 1
-          }
-        },
         "effects": {
           "WebReconSuccesful": 1,
           "current_player": 1
         }
       },
       "pathTraversal": {
-        "preconditions": {
-          "conditions": [
-            "CGIscriptsenabled",
-            "WebReconSuccesful",
-            "VulnerableApacheHTTPServerVersion"
-          ],
-          "logic": "AND",
-          "required_values": {
-            "CGIscriptsenabled": 1,
-            "WebReconSuccesful": 1,
-            "VulnerableApacheHTTPServerVersion": 1
-          }
-        },
         "effects": {
           "AccesstoReverseShell": 1,
           "current_player": 1
@@ -396,77 +328,42 @@
     },
     "defender": {
       "changeCredentials": {
-        "preconditions": {
-          "conditions": [],
-          "logic": "AND",
-          "required_values": {}
-        },
         "effects": {
           "AccesstoMySQL": 2,
           "current_player": 0
         }
       },
       "changeFilePermissions": {
-        "preconditions": {
-          "conditions": [],
-          "logic": "AND",
-          "required_values": {}
-        },
         "effects": {
           "AccesstoSensitiveFiles": 2,
           "current_player": 0
         }
       },
       "encryptFile": {
-        "preconditions": {
-          "conditions": [],
-          "logic": "OR",
-          "required_values": {}
-        },
         "effects": {
           "UnencryptedFiles": 2,
           "current_player": 0
         }
       },
       "deactivateSOCKS5Proxy": {
-        "preconditions": {
-          "conditions": [],
-          "logic": "AND",
-          "required_values": {}
-        },
         "effects": {
           "SOCKS5ProxyActive": 2,
           "current_player": 0
         }
       },
       "reconfigureApache": {
-        "preconditions": {
-          "conditions": [],
-          "logic": "AND",
-          "required_values": {}
-        },
         "effects": {
           "MisconfiguredApache": 2,
           "current_player": 0
         }
       },
       "disableCGIScripts": {
-        "preconditions": {
-          "conditions": [],
-          "logic": "AND",
-          "required_values": {}
-        },
         "effects": {
           "CGIscriptsenabled": 2,
           "current_player": 0
         }
       },
       "updateApache": {
-        "preconditions": {
-          "conditions": [],
-          "logic": "AND",
-          "required_values": {}
-        },
         "effects": {
           "VulnerableApacheHTTPServerVersion": 2,
           "current_player": 0
@@ -492,18 +389,16 @@
       "disableCGIScripts": -45,
       "updateApache": -20
     },
+    "cost_penalty": 10,
     "terminal_rewards": {
       "exfiltrateData": -500
-    }
+    },
+    "win_bonus": 100,
+    "lose_penalty": -100
   },
   "initial_state": {
     "DataExfiltration": 0,
     "current_player": 0,
-    "AccesstoSensitiveFiles": 0,
-    "AccesstoReverseShell": 0,
-    "AccesstoMySQL": 0,
-    "WebReconSuccesful": 0,
-    "AccesstoExecuteArbitraryCode": 0,
     "UnencryptedFiles": 1,
     "SOCKS5ProxyActive": 1,
     "MisconfiguredApache": 1,
