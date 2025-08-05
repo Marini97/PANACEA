@@ -2,7 +2,7 @@ import numpy as np
 import random
 import argparse
 import os
-from adt_multiagent_env import AttackDefenseTreeMultiAgentEnv 
+from rl.adt_env import AttackDefenseTreeMultiAgentEnv 
 
 def demo_environment(env_file):
     """Demonstrate the environment with random actions."""
@@ -151,15 +151,7 @@ def interactive_environment(env_file):
         if all(env.terminations.values()):
             print(f"\n🎮 GAME OVER after {step} steps!")
             print(f"Final rewards: {env.rewards}")
-            
-            # Determine winner
-            if env.rewards["attacker"] > env.rewards["defender"]:
-                print("🎯 ATTACKER WINS!")
-            elif env.rewards["defender"] > env.rewards["attacker"]:
-                print("🛡️  DEFENDER WINS!")
-            else:
-                print("🤝 It's a tie!")
-            break
+            print(f"Winner is: {"Attacker" if env.goal else "Defender"}")
     
     env.close()
 

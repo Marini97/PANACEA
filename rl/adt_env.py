@@ -12,7 +12,7 @@ class AttackDefenseTreeMultiAgentEnv(AECEnv):
     A PettingZoo multi-agent environment for Attack-Defense Trees based on JSON specification.
     
     This environment supports alternating play between an attacker and defender,
-    where each player tries to optimize their strategy according to the tree structure.
+    where each player tries to optimize their strategy.
     """
     
     metadata = {"render_modes": ["human"], "name": "attack_defense_tree_v1"}
