@@ -42,7 +42,8 @@ class AttackDefenseTreeMultiAgentTimeEnv(AECEnv):
         
         # Extract metadata
         self.goal = self.env_spec["metadata"]["goal"]
-        
+        self.goal_reached = False
+
         # Define agents
         self.possible_agents = ["attacker", "defender"]
         self.agents = self.possible_agents[:]
@@ -220,22 +221,18 @@ class AttackDefenseTreeMultiAgentTimeEnv(AECEnv):
         action_name = action_spec["name"]
         
         # Special handling for wait action
-        if action_name == "wait":
-            # Wait is only available when agent has an action in progress
-            if agent == "attacker":
-                return self.attacker_time_remaining > 0
-            else:
-                return self.defender_time_remaining > 0
+        if action_name == "wait" and agent == "attacker":
+            return self.attacker_time_remaining >= 0
+        elif action_name == "wait" and agent == "defender":
+            return self.defender_time_remaining >= 0
         
         # Check if agent already has an action in progress (can't start new action)
-        if agent == "attacker":
-            if self.attacker_current_action is not None:
-                return False
-        else:
-            if self.defender_current_action is not None:
-                return False
-        
-        # Check basic preconditions (same as base environment)
+        if agent == "attacker" and self.attacker_current_action is not None:
+            return False
+        elif agent == "defender" and self.defender_current_action is not None:
+            return False
+
+        # Check basic preconditions
         effect = action_spec.get("effect", None)
         if effect and effect in self.state:
             if agent == "attacker" and self.state[effect] != 0:
@@ -265,7 +262,7 @@ class AttackDefenseTreeMultiAgentTimeEnv(AECEnv):
     def _start_action(self, action_spec: Dict, agent: str):
         """Start an action with time duration. Returns immediate reward."""
         action_name = action_spec["name"]
-        
+        reward = action_spec["cost"]
         if agent == "attacker":
             time_cost = self.attacker_time_costs.get(action_name, 1)
             self.attacker_time_remaining = time_cost
@@ -274,12 +271,11 @@ class AttackDefenseTreeMultiAgentTimeEnv(AECEnv):
             time_cost = self.defender_time_costs.get(action_name, 1)
             self.defender_time_remaining = time_cost
             self.defender_current_action = action_spec
-    
-    def _check_completion_preconditions(self, action_spec: Dict, agent: str) -> bool:
-        """Check if action preconditions are still satisfied for completion (ignore in-progress state)."""
-        action_name = action_spec["name"]
-        
-        # Check basic preconditions (same as base environment)
+        return -abs(reward)
+
+    def _check_final_preconditions(self, action_spec: Dict, agent: str) -> bool:
+        """Check if action final preconditions are satisfied."""
+        # Check basic preconditions
         effect = action_spec.get("effect", None)
         if effect and effect in self.state:
             if agent == "attacker" and self.state[effect] != 0:
@@ -306,30 +302,23 @@ class AttackDefenseTreeMultiAgentTimeEnv(AECEnv):
         else:  # OR
             return any(satisfied) if satisfied else True
 
-    def _complete_action(self, action_spec: Dict, agent: str) -> int:
-        """Complete an action and apply its effects. Returns completion reward."""
-        action_name = action_spec["name"]
-        reward = 0
-        
-        # Re-check preconditions before applying effects (ignore in-progress state)
-        if not self._check_completion_preconditions(action_spec, agent):
+    def _complete_action(self, action_spec: Dict, agent: str):
+        """Complete an action and apply its effects."""
+        # Re-check preconditions before applying effects
+        if not self._check_final_preconditions(action_spec, agent):
             # Action fails due to changed preconditions
             if agent == "attacker":
                 self.attacker_current_action = None
-                self.attacker_time_remaining = -1
             else:
-                self.defender_current_action = None  
-                self.defender_time_remaining = -1
-            return -10  # Penalty for failed action
+                self.defender_current_action = None
+            return
         
         # Mark action as completed
         if agent == "attacker":
             self.attacker_last_action = self.attacker_current_action
             self.attacker_current_action = None
-            self.attacker_time_remaining = -1
         else:
             self.defender_current_action = None
-            self.defender_time_remaining = -1
         
         # Apply primary action effect
         if "effect" in action_spec and action_spec["effect"]:
@@ -339,68 +328,41 @@ class AttackDefenseTreeMultiAgentTimeEnv(AECEnv):
                     self.state[effect_var] = 1  # Compromised
                 else:
                     self.state[effect_var] = 2  # Protected
-        
-        # Get additional action effects from transitions
-        if agent == "attacker" and action_name in self.env_spec["transitions"]["attacker"]:
-            effects = self.env_spec["transitions"]["attacker"][action_name]["effects"]
-        elif agent == "defender" and action_name in self.env_spec["transitions"]["defender"]:
-            effects = self.env_spec["transitions"]["defender"][action_name]["effects"]
-        else:
-            effects = {}
-        
-        # Apply additional state changes from transitions
-        for var, value in effects.items():
-            if var in self.state:
-                self.state[var] = value
-        
-        # Calculate reward for completing the action
-        if agent == "attacker":
-            if action_name in self.env_spec["rewards"]["attacker"]:
-                reward = int(self.env_spec["rewards"]["attacker"][action_name])
-        else:
-            if action_name in self.env_spec["rewards"]["defender"]:
-                reward = int(self.env_spec["rewards"]["defender"][action_name])
-        
-        return reward
     
-    def _wait_action(self, agent: str) -> int:
+    def _wait_action(self, agent: str):
         """Execute wait action - decrease time remaining and check for completion."""
-        reward = 0
-        
-        if agent == "attacker" and self.attacker_time_remaining > 0:
-            self.attacker_time_remaining -= 1
-            
+        if agent == "attacker" and self.attacker_time_remaining >= 0:
             # Check if action completes
             if self.attacker_time_remaining == 0 and self.attacker_current_action is not None:
-                reward = self._complete_action(self.attacker_current_action, agent)
+                self._complete_action(self.attacker_current_action, agent)
+            self.attacker_time_remaining -= 1
         
-        elif agent == "defender" and self.defender_time_remaining > 0:
-            self.defender_time_remaining -= 1
-            
+        elif agent == "defender" and self.defender_time_remaining >= 0:
             # Check if action completes
             if self.defender_time_remaining == 0 and self.defender_current_action is not None:
-                reward = self._complete_action(self.defender_current_action, agent)
-        
-        return reward
+                self._complete_action(self.defender_current_action, agent)
+            self.defender_time_remaining -= 1
     
     def _is_terminal(self) -> bool:
         """Check if the current state is terminal."""
-        # Check goal conditions
-        for terminal_spec in self.env_spec["terminal_states"]:
-            condition = terminal_spec["condition"]
-            if "==" in condition:
-                var, val = condition.split(" == ")
-                if var.strip() in self.state:
-                    return self.state[var.strip()] == int(val.strip())
-        # Check if no actions are available for both agents
+        # Check if goal has been reached
+        if self.state[self.goal] == 1:
+            self.goal_reached = True
+            return True
+        
+        # Check if agents have no available actions
         attacker_actions = self.get_available_actions("attacker")
         defender_actions = self.get_available_actions("defender")
-        return not attacker_actions or not defender_actions
+
+        return len(attacker_actions) == 0 or len(defender_actions) == 0
 
     def reset(self, seed: Optional[int] = None, options: Optional[Dict] = None):
         """Reset the environment to initial state."""
         if seed is not None:
             np.random.seed(seed)
+        
+        # Reset goal tracking
+        self.goal_reached = False
         
         # Reset agents
         self.agents = self.possible_agents[:]
@@ -452,51 +414,44 @@ class AttackDefenseTreeMultiAgentTimeEnv(AECEnv):
         reward = 0
         action_spec = None
         action_name = ""
-        
-        # Check if terminal state reached
-        terminated = self._is_terminal()
-        
+
         # Get action specification
         if action is not None:
             if agent == "attacker":
-                if action >= self.num_attacker_actions:
-                    action = self.num_attacker_actions - 1
                 action_spec = self.attacker_actions[str(action)]
             else:
-                if action >= self.num_defender_actions:
-                    action = self.num_defender_actions - 1
                 action_spec = self.defender_actions[str(action)]
             action_name = action_spec["name"]
-        
+
             # Handle different action types
             if action_name == "wait":
-                # Explicit wait action (action 0)
-                reward = self._wait_action(agent)
+                self._wait_action(agent)
             else:
-                # Regular action - check if we can start it
-                if self._check_preconditions(action_spec, agent):
-                    self._start_action(action_spec, agent)
+                reward = self._start_action(action_spec, agent)
+
+        self.rewards[agent] = reward
+        
+        # Check if terminal state reached
+        terminated = self._is_terminal()
+        if terminated:
+            self.terminations = {agent: True for agent in self.agents}
             
-            if terminated:
-                self.terminations = {agent: True for agent in self.agents}
-                
-                # Assign terminal rewards
-                if self.state.get(self.goal, 0) == 1 and self.attacker_last_action:
-                    # Attacker achieved goal
-                    terminal_reward = abs(self.env_spec["rewards"]["terminal_rewards"][self.attacker_last_action['name']])
-                    self.rewards["attacker"] += 0
-                    self.rewards["defender"] -= terminal_reward
-                else:
-                    # Defender wins
-                    self.rewards["defender"] += 1000
-                    self.rewards["attacker"] -= 0
-                
-                # Update cumulative rewards with terminal rewards
-                for a in self.agents:
-                    self._cumulative_rewards[a] += self.rewards[a]
+            # Assign terminal rewards
+            if self.goal_reached and self.attacker_last_action:
+                # Attacker achieved goal
+                terminal_reward = abs(self.env_spec["rewards"]["terminal_rewards"][self.attacker_last_action['name']])
+                self.rewards["attacker"] += 1000
+                self.rewards["defender"] -= terminal_reward
+            else:
+                # Defender wins
+                self.rewards["defender"] += 1000
+                self.rewards["attacker"] -= 0
+            
+            # Update cumulative rewards with terminal rewards
+            for a in self.agents:
+                self._cumulative_rewards[a] += self.rewards[a]
         
         # Update rewards
-        self.rewards[agent] = reward
         for a in self.agents:
             self._cumulative_rewards[a] += self.rewards[a]
         
@@ -512,8 +467,7 @@ class AttackDefenseTreeMultiAgentTimeEnv(AECEnv):
             "action_taken": action_name,
             "available_actions": available_actions,
             "terminal": terminated,
-            "attacker_time_remaining": self.attacker_time_remaining,
-            "defender_time_remaining": self.defender_time_remaining
+            f"{agent}_time_remaining": self.attacker_time_remaining if agent == "attacker" else self.defender_time_remaining
         }
         
         # Move to next agent

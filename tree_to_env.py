@@ -28,7 +28,6 @@ def get_environment(tree):
         },
         "state_space": {},
         "action_space": {},
-        "transitions": {},
         "rewards": {},
         "initial_state": {},
         "terminal_states": []
@@ -38,7 +37,6 @@ def get_environment(tree):
     _define_state_space(env_spec, goal, df_attacker, df_defender, initial_attributes)
     _define_action_space(env_spec, attacker_actions, defender_actions)
     _define_initial_state(env_spec, goal, initial_attributes)
-    _define_transitions(env_spec, attacker_actions, defender_actions)
     _define_rewards(env_spec, attacker_actions, defender_actions, actions_to_goal)
     _define_terminal_states(env_spec, goal)
     
@@ -167,36 +165,6 @@ def _define_initial_state(env_spec, goal, initial_attributes):
     # Set initial attributes to vulnerable (1)
     for attr in initial_attributes:
         env_spec["initial_state"][attr] = 1
-
-
-def _define_transitions(env_spec, attacker_actions, defender_actions):
-    """Define state transitions for the environment."""
-    env_spec["transitions"] = {
-        "attacker": {},
-        "defender": {}
-    }
-    
-    # Define transitions for each action
-    # Attacker actions
-    for action_name, action_data in attacker_actions.items():
-        env_spec["transitions"]["attacker"][action_name] = {
-            "effects": {
-                action_data["effect"]: 1,  # Achieve the effect
-                "current_player": 1  # Switch to defender
-            }
-        }
-        
-        # Defender actions  
-        for action_name, action_data in defender_actions.items():
-            effect = action_data["effect"]
-            # Defender actions should set effects to 2 to indicate protection/deactivation
-            # This applies to both initial system attributes and attacker-generated attributes
-            env_spec["transitions"]["defender"][action_name] = {
-                "effects": {
-                    effect: 2,  # Always set to 2 for defender protection
-                    "current_player": 0  # Switch to attacker
-                }
-            }
 
 
 def _define_rewards(env_spec, attacker_actions, defender_actions, actions_to_goal):

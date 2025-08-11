@@ -86,7 +86,7 @@ class ActorCritic(nn.Module):
             
             # Convert available_actions to tensor if it's a list
             if isinstance(available_actions, list):
-                available_actions = torch.tensor(available_actions, dtype=torch.long)
+                available_actions = torch.tensor(available_actions, dtype=torch.long, device=logits.device)
             
             # Handle batch dimension properly - get batch size from logits
             batch_size = logits.shape[0]
@@ -124,14 +124,15 @@ class ADTAgent:
     """Actor-Critic agent for the ADT multi-agent environment."""
     
     def __init__(self, state_size: int, action_size: int, agent_name: str, 
-                 lr: float = 3e-4, gamma: float = 0.99, hidden_size: int = 128):
+                 lr: float = 3e-4, gamma: float = 0.99, hidden_size: int = 128, device: str = "cpu"):
         self.agent_name = agent_name
         self.state_size = state_size
         self.action_size = action_size
         self.gamma = gamma
+        self.device = torch.device(device)
         
         # Neural network
-        self.network = ActorCritic(state_size, action_size, hidden_size)
+        self.network = ActorCritic(state_size, action_size, hidden_size).to(self.device)
         self.optimizer = optim.Adam(self.network.parameters(), lr=lr)
         
         # Training data storage
@@ -153,7 +154,7 @@ class ADTAgent:
         """Get action from the policy."""
         if isinstance(state, list):
             state = np.array(state)
-        state_tensor = torch.FloatTensor(state)
+        state_tensor = torch.FloatTensor(state).to(self.device)
         
         # For training, we need gradients
         action, log_prob, value, policy = self.network.get_action(state_tensor, available_actions)
@@ -176,7 +177,7 @@ class ADTAgent:
         """Get detailed action information for analysis."""
         if isinstance(state, list):
             state = np.array(state)
-        state_tensor = torch.FloatTensor(state)
+        state_tensor = torch.FloatTensor(state).to(self.device)
         
         with torch.no_grad():
             logits, value = self.network(state_tensor)
@@ -194,7 +195,7 @@ class ADTAgent:
             # Get the most likely action
             action = torch.argmax(policy).item()
             
-        return action, policy.numpy(), value.item()
+        return action, policy.cpu().numpy(), value.item()
     
     def store_transition(self, state, action, reward, log_prob, value, done):
         """Store a transition for training."""
@@ -206,14 +207,14 @@ class ADTAgent:
         if isinstance(log_prob, torch.Tensor):
             if log_prob.dim() == 0:  # Scalar tensor
                 log_prob = log_prob.unsqueeze(0)  # Make it [1]
-            self.log_probs.append(log_prob)
+            self.log_probs.append(log_prob.cpu())
         else:
             self.log_probs.append(torch.tensor([log_prob], dtype=torch.float32))
             
         if isinstance(value, torch.Tensor):
             if value.dim() == 0:  # Scalar tensor
                 value = value.unsqueeze(0)  # Make it [1]
-            self.values.append(value)
+            self.values.append(value.cpu())
         else:
             self.values.append(torch.tensor([value], dtype=torch.float32))
             
@@ -238,13 +239,13 @@ class ADTAgent:
             return
             
         # Convert to tensors
-        states = torch.FloatTensor(np.array(self.states))
-        actions = torch.LongTensor(self.actions)
+        states = torch.FloatTensor(np.array(self.states)).to(self.device)
+        actions = torch.LongTensor(self.actions).to(self.device)
         
         # Handle log_probs and values with proper tensor stacking
         try:
-            log_probs = torch.stack(self.log_probs).squeeze()
-            values = torch.stack(self.values).squeeze()
+            log_probs = torch.stack(self.log_probs).squeeze().to(self.device)
+            values = torch.stack(self.values).squeeze().to(self.device)
         except RuntimeError as e:
             print(f"Tensor stacking error: {e}")
             print(f"log_probs shapes: {[lp.shape if hasattr(lp, 'shape') else type(lp) for lp in self.log_probs]}")
@@ -255,7 +256,7 @@ class ADTAgent:
         
         # Compute returns
         returns = self.compute_discounted_rewards()
-        returns = torch.FloatTensor(returns)
+        returns = torch.FloatTensor(returns).to(self.device)
         
         # Normalize returns
         if len(returns) > 1:
@@ -319,7 +320,7 @@ class ADTAgent:
     
     def load_model(self, filepath: str):
         """Load a trained model."""
-        checkpoint = torch.load(filepath, map_location='cpu')
+        checkpoint = torch.load(filepath, map_location=self.device)
         self.network.load_state_dict(checkpoint['model_state_dict'])
         self.optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
         self.network.eval()

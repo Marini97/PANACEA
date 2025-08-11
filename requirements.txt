@@ -1,5 +1,20 @@
+# Core dependencies for tree processing and analysis
 matplotlib==3.8.3
 networkx==3.2.1
 numpy==1.26.4
 pandas==2.2.2
+
+# Multi-agent reinforcement learning dependencies
 gymnasium==1.2.0
+pettingzoo==1.24.3
+
+# Deep learning dependencies
+torch>=2.0.0
+
+# Progress bars and visualization
+tqdm==4.66.1
+seaborn==0.13.0
+
+# Jupyter notebook support (optional, for interactive development)
+jupyter==1.0.0
+ipywidgets==8.1.1

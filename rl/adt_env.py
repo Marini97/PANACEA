@@ -156,20 +156,8 @@ class AttackDefenseTreeMultiAgentEnv(AECEnv):
                 else:
                     # Defender sets to 2 (protected)
                     self.state[effect_var] = 2
-        
-        # Get additional action effects from transitions
-        if agent == "attacker" and action_spec["name"] in self.env_spec["transitions"]["attacker"]:
-            effects = self.env_spec["transitions"]["attacker"][action_spec["name"]]["effects"]
-        elif agent == "defender" and action_spec["name"] in self.env_spec["transitions"]["defender"]:
-            effects = self.env_spec["transitions"]["defender"][action_spec["name"]]["effects"]
-        else:
-            effects = {}
-        
-        # Apply additional state changes from transitions
-        for var, value in effects.items():
-            if var in self.state:
-                self.state[var] = value
-        
+                self.state['current_player'] = (self.state['current_player']+1) % 2 # switch player
+
         # Calculate reward for the acting agent
         if agent == "attacker":
             if action_spec["name"] in self.env_spec["rewards"]["attacker"]:
