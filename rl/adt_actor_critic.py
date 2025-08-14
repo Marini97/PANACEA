@@ -11,7 +11,6 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch.distributions import Categorical
 import torch.optim as optim
-import matplotlib.pyplot as plt
 from typing import List, Tuple, Dict, Optional
 import pickle
 
@@ -124,12 +123,20 @@ class ADTAgent:
     """Actor-Critic agent for the ADT multi-agent environment."""
     
     def __init__(self, state_size: int, action_size: int, agent_name: str, 
-                 lr: float = 3e-4, gamma: float = 0.99, hidden_size: int = 128, device: str = "cpu"):
+                 lr: float = 3e-4, gamma: float = 0.99, hidden_size: int = 128, device: str = "cpu",
+                 epsilon_start: float = 1.0, epsilon_end: float = 0.01, epsilon_decay: int = 5000):
         self.agent_name = agent_name
         self.state_size = state_size
         self.action_size = action_size
         self.gamma = gamma
         self.device = torch.device(device)
+        
+        # Epsilon-greedy exploration parameters
+        self.epsilon_start = epsilon_start
+        self.epsilon_end = epsilon_end
+        self.epsilon_decay = epsilon_decay
+        self.epsilon = epsilon_start
+        self.steps_done = 0
         
         # Neural network
         self.network = ActorCritic(state_size, action_size, hidden_size).to(self.device)
@@ -151,15 +158,41 @@ class ADTAgent:
         self.total_losses = []
         
     def get_action(self, state, available_actions=None, deterministic=False):
-        """Get action from the policy."""
+        """Get action from the policy with epsilon-greedy exploration."""
         if isinstance(state, list):
             state = np.array(state)
         state_tensor = torch.FloatTensor(state).to(self.device)
         
-        # For training, we need gradients
+        # Update epsilon for exploration
+        self.steps_done += 1
+        self.epsilon = self.epsilon_end + (self.epsilon_start - self.epsilon_end) * \
+                      np.exp(-1. * self.steps_done / self.epsilon_decay)
+        
+        # Epsilon-greedy exploration (only during training, not when deterministic)
+        if not deterministic and np.random.random() < self.epsilon and available_actions:
+            # Random action from available actions
+            action = np.random.choice(available_actions)
+            
+            # Still need to get policy values for consistency - KEEP GRADIENTS for training
+            logits, value = self.network(state_tensor)
+            
+            # Apply mask for available actions
+            if available_actions is not None and len(available_actions) > 0:
+                mask = torch.full_like(logits, -1e9)
+                for avail_action in available_actions:
+                    if avail_action < logits.shape[1]:
+                        mask[0, avail_action] = 0
+                logits = logits + mask
+            
+            policy = F.softmax(logits, dim=-1).squeeze()
+            log_prob = torch.log(policy[action] + 1e-8)
+            
+            return action, log_prob, value.squeeze(), policy
+        
+        # Normal policy-based action selection
         action, log_prob, value, policy = self.network.get_action(state_tensor, available_actions)
         
-        if policy != None and deterministic and available_actions:
+        if policy is not None and deterministic and available_actions:
             # Choose the action with highest probability among available actions
             with torch.no_grad():
                 masked_policy = policy.clone()
@@ -167,7 +200,7 @@ class ADTAgent:
                     if i not in available_actions:
                         masked_policy[i] = 0
                 action = torch.argmax(masked_policy).item()
-            # Recalculate log_prob for the chosen action (ensure action is int)
+            # Recalculate log_prob for the chosen action
             action_idx = int(action)
             log_prob = torch.log(policy[action_idx] + 1e-8)
         
@@ -197,27 +230,31 @@ class ADTAgent:
             
         return action, policy.cpu().numpy(), value.item()
     
+    def get_epsilon(self):
+        """Get current epsilon value for monitoring."""
+        return self.epsilon
+    
     def store_transition(self, state, action, reward, log_prob, value, done):
         """Store a transition for training."""
         self.states.append(state)
         self.actions.append(action)
         self.rewards.append(reward)
         
-        # Ensure consistent tensor shapes
+        # Keep tensors on-device and with gradients for backprop during update
         if isinstance(log_prob, torch.Tensor):
-            if log_prob.dim() == 0:  # Scalar tensor
-                log_prob = log_prob.unsqueeze(0)  # Make it [1]
-            self.log_probs.append(log_prob.cpu())
+            if log_prob.dim() == 0:
+                log_prob = log_prob.unsqueeze(0)
+            self.log_probs.append(log_prob)  # do NOT move to CPU or detach
         else:
-            self.log_probs.append(torch.tensor([log_prob], dtype=torch.float32))
-            
+            self.log_probs.append(torch.tensor([log_prob], dtype=torch.float32, device=self.device))
+        
         if isinstance(value, torch.Tensor):
-            if value.dim() == 0:  # Scalar tensor
-                value = value.unsqueeze(0)  # Make it [1]
-            self.values.append(value.cpu())
+            if value.dim() == 0:
+                value = value.unsqueeze(0)
+            self.values.append(value)  # do NOT move to CPU or detach
         else:
-            self.values.append(torch.tensor([value], dtype=torch.float32))
-            
+            self.values.append(torch.tensor([value], dtype=torch.float32, device=self.device))
+        
         self.dones.append(done)
     
     def compute_discounted_rewards(self):
@@ -235,59 +272,61 @@ class ADTAgent:
     
     def update_policy(self):
         """Update the policy using actor-critic algorithm."""
-        if len(self.states) == 0:
-            return
-            
-        # Convert to tensors
-        states = torch.FloatTensor(np.array(self.states)).to(self.device)
-        actions = torch.LongTensor(self.actions).to(self.device)
-        
-        # Handle log_probs and values with proper tensor stacking
+        if len(self.states) < 2:
+            return None
+
+        # Stack log_probs and values (keep gradients)
         try:
-            log_probs = torch.stack(self.log_probs).squeeze().to(self.device)
-            values = torch.stack(self.values).squeeze().to(self.device)
+            log_probs = torch.stack([
+                lp.squeeze() if isinstance(lp, torch.Tensor) else torch.as_tensor(lp, dtype=torch.float32, device=self.device)
+            for lp in self.log_probs]).to(self.device)
+
+            values = torch.stack([
+                v.squeeze() if isinstance(v, torch.Tensor) else torch.as_tensor(v, dtype=torch.float32, device=self.device)
+            for v in self.values]).to(self.device)
         except RuntimeError as e:
             print(f"Tensor stacking error: {e}")
-            print(f"log_probs shapes: {[lp.shape if hasattr(lp, 'shape') else type(lp) for lp in self.log_probs]}")
-            print(f"values shapes: {[v.shape if hasattr(v, 'shape') else type(v) for v in self.values]}")
-            # Clear memory and return None
+            print(f"log_probs types/shapes: {[ (type(lp), getattr(lp, 'shape', None)) for lp in self.log_probs ]}")
+            print(f"values types/shapes: {[ (type(v), getattr(v, 'shape', None)) for v in self.values ]}")
             self.clear_episode_data()
             return None
-        
-        # Compute returns
-        returns = self.compute_discounted_rewards()
-        returns = torch.FloatTensor(returns).to(self.device)
-        
-        # Normalize returns
-        if len(returns) > 1:
+
+        if log_probs.numel() == 0 or values.numel() == 0:
+            self.clear_episode_data()
+            return None
+
+        # Compute returns (no grad)
+        returns = torch.as_tensor(self.compute_discounted_rewards(), dtype=torch.float32, device=self.device)
+
+        # Normalize returns for stability
+        if returns.numel() > 1:
             returns = (returns - returns.mean()) / (returns.std() + 1e-8)
-        
-        # Compute advantages
+
+        # Match shapes
+        returns = returns.view_as(values)
+
+        # Advantages
         advantages = returns - values
-        
-        # Actor loss (policy gradient)
+
+        # Losses
         actor_loss = -(log_probs * advantages.detach()).mean()
-        
-        # Critic loss (value function)
         critic_loss = F.mse_loss(values, returns)
-        
-        # Total loss
         total_loss = actor_loss + 0.5 * critic_loss
-        
+
         # Optimize
         self.optimizer.zero_grad()
         total_loss.backward()
         torch.nn.utils.clip_grad_norm_(self.network.parameters(), max_norm=0.5)
         self.optimizer.step()
-        
-        # Store losses for monitoring
+
+        # Log
         self.actor_losses.append(actor_loss.item())
         self.critic_losses.append(critic_loss.item())
         self.total_losses.append(total_loss.item())
-        
-        # Clear episode data
+
+        # Clear buffers after update (on-policy)
         self.clear_episode_data()
-        
+
         return {
             'actor_loss': actor_loss.item(),
             'critic_loss': critic_loss.item(),
@@ -342,12 +381,20 @@ class TrainingMetrics:
         self.defender_wins = []
         self.attacker_losses = {'actor': [], 'critic': [], 'total': []}
         self.defender_losses = {'actor': [], 'critic': [], 'total': []}
+        self.attacker_epsilon = []
+        self.defender_epsilon = []
         
-    def log_episode(self, episode_data: Dict):
+    def log_episode(self, episode_data: Dict, attacker_epsilon: Optional[float] = None, defender_epsilon: Optional[float] = None):
         """Log data from a completed episode."""
         self.attacker_rewards.append(episode_data.get('attacker_reward', 0))
         self.defender_rewards.append(episode_data.get('defender_reward', 0))
         self.episode_lengths.append(episode_data.get('length', 0))
+        
+        # Log epsilon values if provided
+        if attacker_epsilon is not None:
+            self.attacker_epsilon.append(attacker_epsilon)
+        if defender_epsilon is not None:
+            self.defender_epsilon.append(defender_epsilon)
         
         # Determine winner
         att_reward = episode_data.get('attacker_reward', 0)
@@ -394,101 +441,45 @@ class TrainingMetrics:
             'episodes': window
         }
     
-    def plot_training_progress(self, save_path: Optional[str] = None):
-        """Plot comprehensive training progress."""
-        fig, axes = plt.subplots(2, 3, figsize=(18, 12))
-        fig.suptitle('Actor-Critic Training Progress', fontsize=16)
+    def print_training_summary(self):
+        """Print a summary of training metrics without plotting."""
+        print("=" * 60)
+        print("TRAINING SUMMARY")
+        print("=" * 60)
+        print(f"Total Episodes: {len(self.attacker_rewards)}")
         
-        # Moving average function
-        def moving_average(data, window=100):
-            if len(data) < window:
-                return data
-            return np.convolve(data, np.ones(window)/window, mode='valid')
+        if self.episode_lengths:
+            print(f"Average Episode Length: {np.mean(self.episode_lengths):.2f} ± {np.std(self.episode_lengths):.2f}")
         
-        # Episode rewards
-        axes[0, 0].plot(moving_average(self.attacker_rewards), label='Attacker', color='red', alpha=0.8)
-        axes[0, 0].plot(moving_average(self.defender_rewards), label='Defender', color='blue', alpha=0.8)
-        axes[0, 0].set_title('Episode Rewards (Moving Average)')
-        axes[0, 0].set_xlabel('Episode')
-        axes[0, 0].set_ylabel('Reward')
-        axes[0, 0].legend()
-        axes[0, 0].grid(True, alpha=0.3)
+        print()
+        print("REWARDS:")
+        if self.attacker_rewards:
+            print(f"  Attacker - Mean: {np.mean(self.attacker_rewards):.3f}, Std: {np.std(self.attacker_rewards):.3f}")
+        if self.defender_rewards:
+            print(f"  Defender - Mean: {np.mean(self.defender_rewards):.3f}, Std: {np.std(self.defender_rewards):.3f}")
         
-        # Win rates
-        win_window = 50
-        att_win_rate = moving_average([np.mean(self.attacker_wins[max(0, i-win_window):i+1]) 
-                                      for i in range(len(self.attacker_wins))])
-        def_win_rate = moving_average([np.mean(self.defender_wins[max(0, i-win_window):i+1]) 
-                                      for i in range(len(self.defender_wins))])
+        print()
+        print("WIN RATES:")
+        if self.attacker_wins:
+            print(f"  Attacker: {np.mean(self.attacker_wins):.1%}")
+        if self.defender_wins:
+            print(f"  Defender: {np.mean(self.defender_wins):.1%}")
         
-        axes[0, 1].plot(att_win_rate, label='Attacker', color='red', alpha=0.8)
-        axes[0, 1].plot(def_win_rate, label='Defender', color='blue', alpha=0.8)
-        axes[0, 1].set_title(f'Win Rates (Rolling {win_window}-episode window)')
-        axes[0, 1].set_xlabel('Episode')
-        axes[0, 1].set_ylabel('Win Rate')
-        axes[0, 1].set_ylim(0, 1)
-        axes[0, 1].legend()
-        axes[0, 1].grid(True, alpha=0.3)
+        # Recent performance (last 100 episodes)
+        if len(self.attacker_rewards) >= 100:
+            recent_att = self.attacker_rewards[-100:]
+            recent_def = self.defender_rewards[-100:]
+            recent_att_wins = self.attacker_wins[-100:]
+            recent_def_wins = self.defender_wins[-100:]
+            
+            print()
+            print("RECENT PERFORMANCE (Last 100 episodes):")
+            print(f"  Attacker - Mean Reward: {np.mean(recent_att):.3f}")
+            print(f"  Defender - Mean Reward: {np.mean(recent_def):.3f}")
+            print(f"  Attacker Win Rate: {np.mean(recent_att_wins):.1%}")
+            print(f"  Defender Win Rate: {np.mean(recent_def_wins):.1%}")
         
-        # Episode lengths
-        axes[0, 2].plot(moving_average(self.episode_lengths), color='green', alpha=0.8)
-        axes[0, 2].set_title('Episode Lengths (Moving Average)')
-        axes[0, 2].set_xlabel('Episode')
-        axes[0, 2].set_ylabel('Steps')
-        axes[0, 2].grid(True, alpha=0.3)
-        
-        # Training losses - Attacker
-        if self.attacker_losses['total']:
-            axes[1, 0].plot(moving_average(self.attacker_losses['actor']), 
-                           label='Actor', color='orange', alpha=0.8)
-            axes[1, 0].plot(moving_average(self.attacker_losses['critic']), 
-                           label='Critic', color='purple', alpha=0.8)
-            axes[1, 0].plot(moving_average(self.attacker_losses['total']), 
-                           label='Total', color='red', alpha=0.8)
-        axes[1, 0].set_title('Attacker Training Losses')
-        axes[1, 0].set_xlabel('Update')
-        axes[1, 0].set_ylabel('Loss')
-        axes[1, 0].legend()
-        axes[1, 0].grid(True, alpha=0.3)
-        
-        # Training losses - Defender
-        if self.defender_losses['total']:
-            axes[1, 1].plot(moving_average(self.defender_losses['actor']), 
-                           label='Actor', color='orange', alpha=0.8)
-            axes[1, 1].plot(moving_average(self.defender_losses['critic']), 
-                           label='Critic', color='purple', alpha=0.8)
-            axes[1, 1].plot(moving_average(self.defender_losses['total']), 
-                           label='Total', color='blue', alpha=0.8)
-        axes[1, 1].set_title('Defender Training Losses')
-        axes[1, 1].set_xlabel('Update')
-        axes[1, 1].set_ylabel('Loss')
-        axes[1, 1].legend()
-        axes[1, 1].grid(True, alpha=0.3)
-        
-        # Final performance distribution
-        if len(self.attacker_rewards) > 0:
-            recent_window = min(200, len(self.attacker_rewards))
-            recent_att = self.attacker_rewards[-recent_window:]
-            recent_def = self.defender_rewards[-recent_window:]
-
-            range_min = min(min(recent_att), min(recent_def))
-            range_max = max(max(recent_att), max(recent_def))
-
-            axes[1, 2].hist(recent_att, range=(range_min, range_max), alpha=0.6, label='Attacker', color='red')
-            axes[1, 2].hist(recent_def, range=(range_min, range_max), alpha=0.6, label='Defender', color='blue')
-            axes[1, 2].set_title(f'Recent Reward Distribution (Last {recent_window} episodes)')
-            axes[1, 2].set_xlabel('Reward')
-            axes[1, 2].set_ylabel('Frequency')
-            axes[1, 2].legend()
-            axes[1, 2].grid(True, alpha=0.3)
-        
-        plt.tight_layout()
-        
-        if save_path:
-            plt.savefig(save_path, dpi=300, bbox_inches='tight')
-            print(f"Training progress plot saved to {save_path}")
-        
-        plt.show()
+        print("=" * 60)
     
     def save_metrics(self, filepath: str):
         """Save training metrics to file."""
@@ -499,7 +490,9 @@ class TrainingMetrics:
             'attacker_wins': self.attacker_wins,
             'defender_wins': self.defender_wins,
             'attacker_losses': self.attacker_losses,
-            'defender_losses': self.defender_losses
+            'defender_losses': self.defender_losses,
+            'attacker_epsilon': self.attacker_epsilon,
+            'defender_epsilon': self.defender_epsilon
         }
         
         with open(filepath, 'wb') as f:
@@ -519,5 +512,9 @@ class TrainingMetrics:
         self.defender_wins = metrics_data['defender_wins']
         self.attacker_losses = metrics_data['attacker_losses']
         self.defender_losses = metrics_data['defender_losses']
+        
+        # Load epsilon values if available (for backward compatibility)
+        self.attacker_epsilon = metrics_data.get('attacker_epsilon', [])
+        self.defender_epsilon = metrics_data.get('defender_epsilon', [])
         
         print(f"Training metrics loaded from {filepath}")
