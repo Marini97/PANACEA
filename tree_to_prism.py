@@ -118,7 +118,7 @@ def get_info(df):
         
         effect = row["Parent"]
         cost = row["Cost"]
-        refinement = df.loc[df['Label'] == effect]["Refinement"].values[0]
+        refinement = row["Refinement"]
         time = row["Time"]
         preconditions = row["Children"]
         

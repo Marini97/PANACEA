@@ -1,0 +1,364 @@
+<?xml version='1.0'?>
+<adtree>
+	<node refinement="disjunctive">
+		<label>root</label>
+		<comment>Type: Goal
+Role: Attacker</comment>
+		<node refinement="conjunctive">
+			<label>A_1</label>
+			<comment>Type: Action
+Action: a1
+Cost: 50
+Time: 2
+Role: Attacker</comment>
+			<node refinement="conjunctive">
+				<label>N_1</label>
+				<comment>Type: Attribute
+Role: Attacker</comment>
+				<node refinement="conjunctive" switchRole="yes">
+					<label>C_1</label>
+					<comment>Type: Action
+Action: c1
+Cost: 70
+Time: 2
+Role: Defender</comment>
+				</node>
+			</node>
+			<node refinement="conjunctive">
+				<label>N_2</label>
+				<comment>Type: Attribute
+Role: Attacker</comment>
+				<node refinement="disjunctive">
+					<label>A_3</label>
+					<comment>Type: Action
+Action: a3
+Cost: 50
+Time: 1
+Role: Attacker</comment>
+					<node refinement="disjunctive">
+						<label>N_4</label>
+						<comment>Type: Attribute
+Role: Attacker</comment>
+						<node refinement="disjunctive">
+							<label>A_5</label>
+							<comment>Type: Action
+Action: a5
+Cost: 100
+Time: 3
+Role: Attacker</comment>
+							<node refinement="disjunctive">
+								<label>N_5</label>
+								<comment>Type: Attribute
+Role: Attacker</comment>
+								<node refinement="conjunctive">
+									<label>A_8</label>
+									<comment>Type: Action
+Action: a8
+Cost: 100
+Time: 3
+Role: Attacker</comment>
+									<node refinement="conjunctive">
+										<label>N_8</label>
+										<comment>Type: Attribute
+Role: Attacker</comment>
+										<node refinement="conjunctive">
+											<label>A_14</label>
+											<comment>Type: Action
+Action: a14
+Cost: 100
+Time: 1
+Role: Attacker</comment>
+											<node refinement="conjunctive">
+												<label>N_101</label>
+												<comment>Type: Attribute
+Role: Attacker</comment>
+											</node>
+										</node>
+										<node refinement="conjunctive" switchRole="yes">
+											<label>C_8</label>
+											<comment>Type: Action
+Action: c8
+Cost: 30
+Time: 2
+Role: Defender</comment>
+										</node>
+									</node>
+								</node>
+								<node refinement="conjunctive">
+									<label>A_9</label>
+									<comment>Type: Action
+Action: a9
+Cost: 30
+Time: 1
+Role: Attacker</comment>
+									<node refinement="conjunctive">
+										<label>N_9</label>
+										<comment>Type: Attribute
+Role: Attacker</comment>
+										<node refinement="conjunctive">
+											<label>A_15</label>
+											<comment>Type: Action
+Action: a15
+Cost: 30
+Time: 1
+Role: Attacker</comment>
+											<node refinement="conjunctive">
+												<label>N_102</label>
+												<comment>Type: Attribute
+Role: Attacker</comment>
+											</node>
+										</node>
+										<node refinement="conjunctive" switchRole="yes">
+											<label>C_9</label>
+											<comment>Type: Action
+Action: c9
+Cost: 40
+Time: 2
+Role: Defender</comment>
+										</node>
+									</node>
+								</node>
+								<node refinement="conjunctive">
+									<label>A_10</label>
+									<comment>Type: Action
+Action: a10
+Cost: 10
+Time: 2
+Role: Attacker</comment>
+									<node refinement="conjunctive">
+										<label>N_10</label>
+										<comment>Type: Attribute
+Role: Attacker</comment>
+										<node refinement="conjunctive">
+											<label>A_16</label>
+											<comment>Type: Action
+Action: a16
+Cost: 10
+Time: 1
+Role: Attacker</comment>
+											<node refinement="conjunctive">
+												<label>N_103</label>
+												<comment>Type: Attribute
+Role: Attacker</comment>
+											</node>
+										</node>
+										<node refinement="conjunctive" switchRole="yes">
+											<label>C_10</label>
+											<comment>Type: Action
+Action: c10
+Cost: 20
+Time: 1
+Role: Defender</comment>
+										</node>
+									</node>
+								</node>
+								<node refinement="conjunctive" switchRole="yes">
+									<label>C_5</label>
+									<comment>Type: Action
+Action: c5
+Cost: 30
+Time: 2
+Role: Defender</comment>
+								</node>
+							</node>
+						</node>
+						<node refinement="disjunctive">
+							<label>A_6</label>
+							<comment>Type: Action
+Action: a6
+Cost: 30
+Time: 1
+Role: Attacker</comment>
+							<node refinement="disjunctive">
+								<label>N_6</label>
+								<comment>Type: Attribute
+Role: Attacker</comment>
+								<node refinement="conjunctive">
+									<label>A_11</label>
+									<comment>Type: Action
+Action: a11
+Cost: 100
+Time: 3
+Role: Attacker</comment>
+									<node refinement="conjunctive">
+										<label>N_11</label>
+										<comment>Type: Attribute
+Role: Attacker</comment>
+										<node refinement="conjunctive">
+											<label>A_17</label>
+											<comment>Type: Action
+Action: a17
+Cost: 100
+Time: 1
+Role: Attacker</comment>
+											<node refinement="conjunctive">
+												<label>N_104</label>
+												<comment>Type: Attribute
+Role: Attacker</comment>
+											</node>
+										</node>
+										<node refinement="conjunctive" switchRole="yes">
+											<label>C_11</label>
+											<comment>Type: Action
+Action: c11
+Cost: 30
+Time: 2
+Role: Defender</comment>
+										</node>
+									</node>
+								</node>
+								<node refinement="conjunctive">
+									<label>A_12</label>
+									<comment>Type: Action
+Action: a12
+Cost: 30
+Time: 1
+Role: Attacker</comment>
+									<node refinement="conjunctive">
+										<label>N_12</label>
+										<comment>Type: Attribute
+Role: Attacker</comment>
+										<node refinement="conjunctive">
+											<label>A_18</label>
+											<comment>Type: Action
+Action: a18
+Cost: 30
+Time: 1
+Role: Attacker</comment>
+											<node refinement="conjunctive">
+												<label>N_105</label>
+												<comment>Type: Attribute
+Role: Attacker</comment>
+											</node>
+										</node>
+										<node refinement="conjunctive" switchRole="yes">
+											<label>C_12</label>
+											<comment>Type: Action
+Action: c12
+Cost: 40
+Time: 2
+Role: Defender</comment>
+										</node>
+									</node>
+								</node>
+								<node refinement="conjunctive" switchRole="yes">
+									<label>C_6</label>
+									<comment>Type: Action
+Action: c6
+Cost: 40
+Time: 2
+Role: Defender</comment>
+								</node>
+							</node>
+						</node>
+						<node refinement="conjunctive">
+							<label>A_7</label>
+							<comment>Type: Action
+Action: a7
+Cost: 10
+Time: 2
+Role: Attacker</comment>
+							<node refinement="conjunctive">
+								<label>N_7</label>
+								<comment>Type: Attribute
+Role: Attacker</comment>
+								<node refinement="conjunctive">
+									<label>A_13</label>
+									<comment>Type: Action
+Action: a13
+Cost: 500
+Time: 3
+Role: Attacker</comment>
+									<node refinement="conjunctive">
+										<label>N_13</label>
+										<comment>Type: Attribute
+Role: Attacker</comment>
+										<node refinement="conjunctive">
+											<label>A_19</label>
+											<comment>Type: Action
+Action: a19
+Cost: 500
+Time: 2
+Role: Attacker</comment>
+											<node refinement="conjunctive">
+												<label>N_106</label>
+												<comment>Type: Attribute
+Role: Attacker</comment>
+											</node>
+										</node>
+										<node refinement="conjunctive" switchRole="yes">
+											<label>C_13</label>
+											<comment>Type: Action
+Action: c13
+Cost: 500
+Time: 2
+Role: Defender</comment>
+										</node>
+									</node>
+								</node>
+								<node refinement="conjunctive" switchRole="yes">
+									<label>C_7</label>
+									<comment>Type: Action
+Action: c7
+Cost: 20
+Time: 1
+Role: Defender</comment>
+								</node>
+							</node>
+						</node>
+						<node refinement="disjunctive" switchRole="yes">
+							<label>C_4</label>
+							<comment>Type: Action
+Action: c4
+Cost: 50
+Time: 1
+Role: Defender</comment>
+						</node>
+					</node>
+				</node>
+				<node refinement="conjunctive" switchRole="yes">
+					<label>C_2</label>
+					<comment>Type: Action
+Action: c2
+Cost: 100
+Time: 2
+Role: Defender</comment>
+				</node>
+			</node>
+		</node>
+		<node refinement="conjunctive">
+			<label>A_2</label>
+			<comment>Type: Action
+Action: a2
+Cost: 500
+Time: 3
+Role: Attacker</comment>
+			<node refinement="conjunctive">
+				<label>N_3</label>
+				<comment>Type: Attribute
+Role: Attacker</comment>
+				<node refinement="conjunctive">
+					<label>A_4</label>
+					<comment>Type: Action
+Action: a4
+Cost: 500
+Time: 2
+Role: Attacker</comment>
+					<node refinement="conjunctive">
+						<label>N_100</label>
+						<comment>Type: Attribute
+Role: Attacker</comment>
+					</node>
+				</node>
+				<node refinement="conjunctive" switchRole="yes">
+					<label>C_3</label>
+					<comment>Type: Action
+Action: c3
+Cost: 500
+Time: 2
+Role: Defender</comment>
+				</node>
+			</node>
+		</node>
+	</node>
+</adtree>

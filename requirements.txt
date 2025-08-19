@@ -5,7 +5,6 @@ numpy==1.26.4
 pandas==2.2.2
 
 # Multi-agent reinforcement learning dependencies
-gymnasium==1.2.0
 pettingzoo==1.24.3
 
 # Deep learning dependencies

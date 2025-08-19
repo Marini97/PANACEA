@@ -1,0 +1,594 @@
+{
+  "metadata": {
+    "goal": "root",
+    "actions_to_goal": [
+      "a1",
+      "a2"
+    ],
+    "initial_attributes": [
+      "N_1",
+      "N_100",
+      "N_101",
+      "N_102",
+      "N_103",
+      "N_104",
+      "N_105",
+      "N_106"
+    ]
+  },
+  "state_space": {
+    "root": {
+      "type": "discrete",
+      "low": 0,
+      "high": 1
+    },
+    "current_player": {
+      "type": "discrete",
+      "low": 0,
+      "high": 1
+    },
+    "N_6": {
+      "type": "discrete",
+      "low": 0,
+      "high": 2
+    },
+    "N_8": {
+      "type": "discrete",
+      "low": 0,
+      "high": 2
+    },
+    "N_3": {
+      "type": "discrete",
+      "low": 0,
+      "high": 2
+    },
+    "N_9": {
+      "type": "discrete",
+      "low": 0,
+      "high": 2
+    },
+    "N_11": {
+      "type": "discrete",
+      "low": 0,
+      "high": 2
+    },
+    "N_7": {
+      "type": "discrete",
+      "low": 0,
+      "high": 2
+    },
+    "N_13": {
+      "type": "discrete",
+      "low": 0,
+      "high": 2
+    },
+    "N_10": {
+      "type": "discrete",
+      "low": 0,
+      "high": 2
+    },
+    "N_12": {
+      "type": "discrete",
+      "low": 0,
+      "high": 2
+    },
+    "N_4": {
+      "type": "discrete",
+      "low": 0,
+      "high": 2
+    },
+    "N_2": {
+      "type": "discrete",
+      "low": 0,
+      "high": 2
+    },
+    "N_5": {
+      "type": "discrete",
+      "low": 0,
+      "high": 2
+    },
+    "N_1": {
+      "type": "discrete",
+      "low": 1,
+      "high": 2
+    },
+    "N_100": {
+      "type": "discrete",
+      "low": 1,
+      "high": 2
+    },
+    "N_101": {
+      "type": "discrete",
+      "low": 1,
+      "high": 2
+    },
+    "N_102": {
+      "type": "discrete",
+      "low": 1,
+      "high": 2
+    },
+    "N_103": {
+      "type": "discrete",
+      "low": 1,
+      "high": 2
+    },
+    "N_104": {
+      "type": "discrete",
+      "low": 1,
+      "high": 2
+    },
+    "N_105": {
+      "type": "discrete",
+      "low": 1,
+      "high": 2
+    },
+    "N_106": {
+      "type": "discrete",
+      "low": 1,
+      "high": 2
+    }
+  },
+  "action_space": {
+    "attacker": {
+      "type": "discrete",
+      "actions": {
+        "0": {
+          "name": "a1",
+          "preconditions": {
+            "conditions": [
+              "N_2",
+              "N_1"
+            ],
+            "logic": "AND"
+          },
+          "effect": "root",
+          "cost": 50,
+          "time": 2,
+          "refinement": "conjunctive"
+        },
+        "1": {
+          "name": "a2",
+          "preconditions": {
+            "conditions": [
+              "N_3"
+            ],
+            "logic": "AND"
+          },
+          "effect": "root",
+          "cost": 500,
+          "time": 3,
+          "refinement": "conjunctive"
+        },
+        "2": {
+          "name": "a3",
+          "preconditions": {
+            "conditions": [
+              "N_4"
+            ],
+            "logic": "OR"
+          },
+          "effect": "N_2",
+          "cost": 50,
+          "time": 1,
+          "refinement": "disjunctive"
+        },
+        "3": {
+          "name": "a4",
+          "preconditions": {
+            "conditions": [
+              "N_100"
+            ],
+            "logic": "AND"
+          },
+          "effect": "N_3",
+          "cost": 500,
+          "time": 2,
+          "refinement": "conjunctive"
+        },
+        "4": {
+          "name": "a5",
+          "preconditions": {
+            "conditions": [
+              "N_5"
+            ],
+            "logic": "OR"
+          },
+          "effect": "N_4",
+          "cost": 100,
+          "time": 3,
+          "refinement": "disjunctive"
+        },
+        "5": {
+          "name": "a6",
+          "preconditions": {
+            "conditions": [
+              "N_6"
+            ],
+            "logic": "OR"
+          },
+          "effect": "N_4",
+          "cost": 30,
+          "time": 1,
+          "refinement": "disjunctive"
+        },
+        "6": {
+          "name": "a7",
+          "preconditions": {
+            "conditions": [
+              "N_7"
+            ],
+            "logic": "AND"
+          },
+          "effect": "N_4",
+          "cost": 10,
+          "time": 2,
+          "refinement": "conjunctive"
+        },
+        "7": {
+          "name": "a8",
+          "preconditions": {
+            "conditions": [
+              "N_8"
+            ],
+            "logic": "AND"
+          },
+          "effect": "N_5",
+          "cost": 100,
+          "time": 3,
+          "refinement": "conjunctive"
+        },
+        "8": {
+          "name": "a9",
+          "preconditions": {
+            "conditions": [
+              "N_9"
+            ],
+            "logic": "AND"
+          },
+          "effect": "N_5",
+          "cost": 30,
+          "time": 1,
+          "refinement": "conjunctive"
+        },
+        "9": {
+          "name": "a10",
+          "preconditions": {
+            "conditions": [
+              "N_10"
+            ],
+            "logic": "AND"
+          },
+          "effect": "N_5",
+          "cost": 10,
+          "time": 2,
+          "refinement": "conjunctive"
+        },
+        "10": {
+          "name": "a11",
+          "preconditions": {
+            "conditions": [
+              "N_11"
+            ],
+            "logic": "AND"
+          },
+          "effect": "N_6",
+          "cost": 100,
+          "time": 3,
+          "refinement": "conjunctive"
+        },
+        "11": {
+          "name": "a12",
+          "preconditions": {
+            "conditions": [
+              "N_12"
+            ],
+            "logic": "AND"
+          },
+          "effect": "N_6",
+          "cost": 30,
+          "time": 1,
+          "refinement": "conjunctive"
+        },
+        "12": {
+          "name": "a13",
+          "preconditions": {
+            "conditions": [
+              "N_13"
+            ],
+            "logic": "AND"
+          },
+          "effect": "N_7",
+          "cost": 500,
+          "time": 3,
+          "refinement": "conjunctive"
+        },
+        "13": {
+          "name": "a14",
+          "preconditions": {
+            "conditions": [
+              "N_101"
+            ],
+            "logic": "AND"
+          },
+          "effect": "N_8",
+          "cost": 100,
+          "time": 1,
+          "refinement": "conjunctive"
+        },
+        "14": {
+          "name": "a15",
+          "preconditions": {
+            "conditions": [
+              "N_102"
+            ],
+            "logic": "AND"
+          },
+          "effect": "N_9",
+          "cost": 30,
+          "time": 1,
+          "refinement": "conjunctive"
+        },
+        "15": {
+          "name": "a16",
+          "preconditions": {
+            "conditions": [
+              "N_103"
+            ],
+            "logic": "AND"
+          },
+          "effect": "N_10",
+          "cost": 10,
+          "time": 1,
+          "refinement": "conjunctive"
+        },
+        "16": {
+          "name": "a17",
+          "preconditions": {
+            "conditions": [
+              "N_104"
+            ],
+            "logic": "AND"
+          },
+          "effect": "N_11",
+          "cost": 100,
+          "time": 1,
+          "refinement": "conjunctive"
+        },
+        "17": {
+          "name": "a18",
+          "preconditions": {
+            "conditions": [
+              "N_105"
+            ],
+            "logic": "AND"
+          },
+          "effect": "N_12",
+          "cost": 30,
+          "time": 1,
+          "refinement": "conjunctive"
+        },
+        "18": {
+          "name": "a19",
+          "preconditions": {
+            "conditions": [
+              "N_106"
+            ],
+            "logic": "AND"
+          },
+          "effect": "N_13",
+          "cost": 500,
+          "time": 2,
+          "refinement": "conjunctive"
+        }
+      }
+    },
+    "defender": {
+      "type": "discrete",
+      "actions": {
+        "0": {
+          "name": "c1",
+          "preconditions": {
+            "conditions": [],
+            "logic": "AND"
+          },
+          "effect": "N_1",
+          "cost": 70,
+          "time": 2,
+          "refinement": "conjunctive"
+        },
+        "1": {
+          "name": "c2",
+          "preconditions": {
+            "conditions": [],
+            "logic": "AND"
+          },
+          "effect": "N_2",
+          "cost": 100,
+          "time": 2,
+          "refinement": "conjunctive"
+        },
+        "2": {
+          "name": "c3",
+          "preconditions": {
+            "conditions": [],
+            "logic": "AND"
+          },
+          "effect": "N_3",
+          "cost": 500,
+          "time": 2,
+          "refinement": "conjunctive"
+        },
+        "3": {
+          "name": "c4",
+          "preconditions": {
+            "conditions": [],
+            "logic": "OR"
+          },
+          "effect": "N_4",
+          "cost": 50,
+          "time": 1,
+          "refinement": "disjunctive"
+        },
+        "4": {
+          "name": "c5",
+          "preconditions": {
+            "conditions": [],
+            "logic": "AND"
+          },
+          "effect": "N_5",
+          "cost": 30,
+          "time": 2,
+          "refinement": "conjunctive"
+        },
+        "5": {
+          "name": "c6",
+          "preconditions": {
+            "conditions": [],
+            "logic": "AND"
+          },
+          "effect": "N_6",
+          "cost": 40,
+          "time": 2,
+          "refinement": "conjunctive"
+        },
+        "6": {
+          "name": "c7",
+          "preconditions": {
+            "conditions": [],
+            "logic": "AND"
+          },
+          "effect": "N_7",
+          "cost": 20,
+          "time": 1,
+          "refinement": "conjunctive"
+        },
+        "7": {
+          "name": "c8",
+          "preconditions": {
+            "conditions": [],
+            "logic": "AND"
+          },
+          "effect": "N_8",
+          "cost": 30,
+          "time": 2,
+          "refinement": "conjunctive"
+        },
+        "8": {
+          "name": "c9",
+          "preconditions": {
+            "conditions": [],
+            "logic": "AND"
+          },
+          "effect": "N_9",
+          "cost": 40,
+          "time": 2,
+          "refinement": "conjunctive"
+        },
+        "9": {
+          "name": "c10",
+          "preconditions": {
+            "conditions": [],
+            "logic": "AND"
+          },
+          "effect": "N_10",
+          "cost": 20,
+          "time": 1,
+          "refinement": "conjunctive"
+        },
+        "10": {
+          "name": "c11",
+          "preconditions": {
+            "conditions": [],
+            "logic": "AND"
+          },
+          "effect": "N_11",
+          "cost": 30,
+          "time": 2,
+          "refinement": "conjunctive"
+        },
+        "11": {
+          "name": "c12",
+          "preconditions": {
+            "conditions": [],
+            "logic": "AND"
+          },
+          "effect": "N_12",
+          "cost": 40,
+          "time": 2,
+          "refinement": "conjunctive"
+        },
+        "12": {
+          "name": "c13",
+          "preconditions": {
+            "conditions": [],
+            "logic": "AND"
+          },
+          "effect": "N_13",
+          "cost": 500,
+          "time": 2,
+          "refinement": "conjunctive"
+        }
+      }
+    }
+  },
+  "rewards": {
+    "attacker": {
+      "a1": -50,
+      "a2": -500,
+      "a3": -50,
+      "a4": -500,
+      "a5": -100,
+      "a6": -30,
+      "a7": -10,
+      "a8": -100,
+      "a9": -30,
+      "a10": -10,
+      "a11": -100,
+      "a12": -30,
+      "a13": -500,
+      "a14": -100,
+      "a15": -30,
+      "a16": -10,
+      "a17": -100,
+      "a18": -30,
+      "a19": -500
+    },
+    "defender": {
+      "c1": -70,
+      "c2": -100,
+      "c3": -500,
+      "c4": -50,
+      "c5": -30,
+      "c6": -40,
+      "c7": -20,
+      "c8": -30,
+      "c9": -40,
+      "c10": -20,
+      "c11": -30,
+      "c12": -40,
+      "c13": -500
+    },
+    "cost_penalty": 10,
+    "terminal_rewards": {
+      "a1": -500,
+      "a2": -5000
+    }
+  },
+  "initial_state": {
+    "root": 0,
+    "current_player": 0,
+    "N_1": 1,
+    "N_100": 1,
+    "N_101": 1,
+    "N_102": 1,
+    "N_103": 1,
+    "N_104": 1,
+    "N_105": 1,
+    "N_106": 1
+  },
+  "terminal_states": [
+    {
+      "condition": "root == 1"
+    }
+  ]
+}

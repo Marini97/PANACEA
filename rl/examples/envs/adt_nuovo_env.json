@@ -1,0 +1,295 @@
+{
+  "metadata": {
+    "goal": "DataExfiltration",
+    "actions_to_goal": [
+      "exfiltrateData"
+    ],
+    "initial_attributes": [
+      "UnencryptedFiles",
+      "SOCKS5ProxyActive",
+      "MisconfiguredApache",
+      "WebserverPubliclyExposed",
+      "CGIscriptsenabled",
+      "VulnerableApacheHTTPServerVersion",
+      "WebserverPubliclyExposed"
+    ]
+  },
+  "state_space": {
+    "DataExfiltration": {
+      "type": "discrete",
+      "low": 0,
+      "high": 1
+    },
+    "current_player": {
+      "type": "discrete",
+      "low": 0,
+      "high": 1
+    },
+    "WebReconSuccesful": {
+      "type": "discrete",
+      "low": 0,
+      "high": 2
+    },
+    "AccesstoSensitiveFiles": {
+      "type": "discrete",
+      "low": 0,
+      "high": 2
+    },
+    "AccesstoMySQL": {
+      "type": "discrete",
+      "low": 0,
+      "high": 2
+    },
+    "AccesstoReverseShell": {
+      "type": "discrete",
+      "low": 0,
+      "high": 2
+    },
+    "AccesstoExecuteArbitraryCode": {
+      "type": "discrete",
+      "low": 0,
+      "high": 2
+    },
+    "UnencryptedFiles": {
+      "type": "discrete",
+      "low": 1,
+      "high": 2
+    },
+    "SOCKS5ProxyActive": {
+      "type": "discrete",
+      "low": 1,
+      "high": 2
+    },
+    "MisconfiguredApache": {
+      "type": "discrete",
+      "low": 1,
+      "high": 2
+    },
+    "WebserverPubliclyExposed": {
+      "type": "discrete",
+      "low": 1,
+      "high": 2
+    },
+    "CGIscriptsenabled": {
+      "type": "discrete",
+      "low": 1,
+      "high": 2
+    },
+    "VulnerableApacheHTTPServerVersion": {
+      "type": "discrete",
+      "low": 1,
+      "high": 2
+    }
+  },
+  "action_space": {
+    "attacker": {
+      "type": "discrete",
+      "actions": {
+        "0": {
+          "name": "exfiltrateData",
+          "preconditions": {
+            "conditions": [
+              "AccesstoMySQL",
+              "AccesstoExecuteArbitraryCode"
+            ],
+            "logic": "OR"
+          },
+          "effect": "DataExfiltration",
+          "cost": 50,
+          "time": 2,
+          "refinement": "disjunctive"
+        },
+        "1": {
+          "name": "getLoginData",
+          "preconditions": {
+            "conditions": [
+              "UnencryptedFiles",
+              "AccesstoSensitiveFiles"
+            ],
+            "logic": "AND"
+          },
+          "effect": "AccesstoMySQL",
+          "cost": 10,
+          "time": 2,
+          "refinement": "conjunctive"
+        },
+        "2": {
+          "name": "bufferOverflow",
+          "preconditions": {
+            "conditions": [
+              "WebReconSuccesful",
+              "SOCKS5ProxyActive"
+            ],
+            "logic": "AND"
+          },
+          "effect": "AccesstoExecuteArbitraryCode",
+          "cost": 40,
+          "time": 2,
+          "refinement": "conjunctive"
+        },
+        "3": {
+          "name": "getFiles",
+          "preconditions": {
+            "conditions": [
+              "AccesstoReverseShell",
+              "MisconfiguredApache"
+            ],
+            "logic": "AND"
+          },
+          "effect": "AccesstoSensitiveFiles",
+          "cost": 30,
+          "time": 2,
+          "refinement": "conjunctive"
+        },
+        "4": {
+          "name": "webRecon",
+          "preconditions": {
+            "conditions": [
+              "WebserverPubliclyExposed"
+            ],
+            "logic": "OR"
+          },
+          "effect": "WebReconSuccesful",
+          "cost": 5,
+          "time": 1,
+          "refinement": "disjunctive"
+        },
+        "5": {
+          "name": "pathTraversal",
+          "preconditions": {
+            "conditions": [
+              "WebReconSuccesful",
+              "CGIscriptsenabled",
+              "VulnerableApacheHTTPServerVersion"
+            ],
+            "logic": "AND"
+          },
+          "effect": "AccesstoReverseShell",
+          "cost": 20,
+          "time": 2,
+          "refinement": "conjunctive"
+        }
+      }
+    },
+    "defender": {
+      "type": "discrete",
+      "actions": {
+        "0": {
+          "name": "changeCredentials",
+          "preconditions": {
+            "conditions": [],
+            "logic": "OR"
+          },
+          "effect": "AccesstoMySQL",
+          "cost": 200,
+          "time": 2,
+          "refinement": "disjunctive"
+        },
+        "1": {
+          "name": "changeFilePermissions",
+          "preconditions": {
+            "conditions": [],
+            "logic": "AND"
+          },
+          "effect": "AccesstoSensitiveFiles",
+          "cost": 60,
+          "time": 2,
+          "refinement": "conjunctive"
+        },
+        "2": {
+          "name": "encryptFile",
+          "preconditions": {
+            "conditions": [],
+            "logic": "OR"
+          },
+          "effect": "UnencryptedFiles",
+          "cost": 150,
+          "time": 5,
+          "refinement": "disjunctive"
+        },
+        "3": {
+          "name": "deactivateSOCKS5Proxy",
+          "preconditions": {
+            "conditions": [],
+            "logic": "AND"
+          },
+          "effect": "SOCKS5ProxyActive",
+          "cost": 120,
+          "time": 1,
+          "refinement": "conjunctive"
+        },
+        "4": {
+          "name": "reconfigureApache",
+          "preconditions": {
+            "conditions": [],
+            "logic": "AND"
+          },
+          "effect": "MisconfiguredApache",
+          "cost": 50,
+          "time": 2,
+          "refinement": "conjunctive"
+        },
+        "5": {
+          "name": "disableCGIScripts",
+          "preconditions": {
+            "conditions": [],
+            "logic": "AND"
+          },
+          "effect": "CGIscriptsenabled",
+          "cost": 45,
+          "time": 1,
+          "refinement": "conjunctive"
+        },
+        "6": {
+          "name": "updateApache",
+          "preconditions": {
+            "conditions": [],
+            "logic": "AND"
+          },
+          "effect": "VulnerableApacheHTTPServerVersion",
+          "cost": 20,
+          "time": 20,
+          "refinement": "conjunctive"
+        }
+      }
+    }
+  },
+  "rewards": {
+    "attacker": {
+      "exfiltrateData": -50,
+      "getLoginData": -10,
+      "bufferOverflow": -40,
+      "getFiles": -30,
+      "webRecon": -5,
+      "pathTraversal": -20
+    },
+    "defender": {
+      "changeCredentials": -200,
+      "changeFilePermissions": -60,
+      "encryptFile": -150,
+      "deactivateSOCKS5Proxy": -120,
+      "reconfigureApache": -50,
+      "disableCGIScripts": -45,
+      "updateApache": -20
+    },
+    "cost_penalty": 10,
+    "terminal_rewards": {
+      "exfiltrateData": -500
+    }
+  },
+  "initial_state": {
+    "DataExfiltration": 0,
+    "current_player": 0,
+    "UnencryptedFiles": 1,
+    "SOCKS5ProxyActive": 1,
+    "MisconfiguredApache": 1,
+    "WebserverPubliclyExposed": 1,
+    "CGIscriptsenabled": 1,
+    "VulnerableApacheHTTPServerVersion": 1
+  },
+  "terminal_states": [
+    {
+      "condition": "DataExfiltration == 1"
+    }
+  ]
+}

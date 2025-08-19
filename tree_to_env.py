@@ -207,35 +207,6 @@ def save_environment(env_spec, file):
         json.dump(env_spec, f, indent=2)
 
 
-def convert_tree_to_gym_env(xml_file: str, output_file: Optional[str] = None):
-    """
-    Convert an XML tree file to a Gymnasium environment specification.
-    
-    Args:
-        xml_file (str): Path to the XML tree file
-        output_file (str): Path to save the JSON environment specification
-                          If None, uses the XML filename with .json extension
-    
-    Returns:
-        Dict: The environment specification
-    """
-    # Parse the XML file
-    tree = parse_file(xml_file)
-    
-    # Generate environment specification
-    env_spec = get_environment(tree)
-    
-    # Generate output filename if not provided
-    if output_file is None:
-        output_file = xml_file.replace('.xml', '_env.json')
-    
-    # Save environment
-    save_environment(env_spec, output_file)
-    print(f"Environment saved to {output_file}")
-    
-    return env_spec
-
-
 def load_environment_spec(json_file: str) -> Dict:
     """
     Load an environment specification from a JSON file.
